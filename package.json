@@ -1,0 +1,78 @@
+{
+  "name": "file-uploader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@types/jest": "^29.1.1",
+    "@types/node": "^18.7.23",
+    "@types/react": "^18.0.21",
+    "@types/react-dom": "^18.0.6",
+    "axios": "^0.27.2",
+    "cra-template-typescript": "1.2.0",
+    "framer-motion": "^7.5.0",
+    "i18next": "^21.9.2",
+    "i18next-browser-languagedetector": "^6.1.5",
+    "i18next-http-backend": "^1.4.4",
+    "lottie-react": "^2.3.1",
+    "react": "^18.2.0",
+    "react-cool-inview": "^3.0.1",
+    "react-cool-virtual": "^0.7.0",
+    "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0",
+    "react-hook-form": "^7.36.1",
+    "react-i18next": "^11.18.6",
+    "react-qr-code": "^2.0.8",
+    "react-router-dom": "^6.4.1",
+    "react-select": "^5.4.0",
+    "react-to-print": "^2.14.7",
+    "typescript": "^4.8.4",
+    "web-vitals": "^3.0.2"
+  },
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@craco/craco": "^7.0.0-alpha.3",
+    "autoprefixer": "^10.4.12",
+    "postcss": "^8.4.16",
+    "postcss-import": "^15.0.0",
+    "react-scripts": "5.0.1",
+    "tailwindcss": "^3.1.8",
+    "tsconfig-paths-webpack-plugin": "^4.0.0"
+  },
+  "packageManager": "yarn@3.2.3",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/health-tag/file-uploader.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/health-tag/file-uploader/issues"
+  },
+  "homepage": "https://github.com/health-tag/file-uploader#readme"
+}
