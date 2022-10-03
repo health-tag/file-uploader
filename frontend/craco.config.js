@@ -9,6 +9,7 @@ module.exports = {
         return postcssLoaderOptions;
       },
     },
+  },
   plugins: [
     {
       plugin: {

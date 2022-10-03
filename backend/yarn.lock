@@ -3389,12 +3389,12 @@ __metadata:
     eslint-plugin-prettier: ^4.2.1
     jest: 29.1.2
     prettier: ^2.7.1
+    python-shell: ^3.0.1
     reflect-metadata: ^0.1.13
     rimraf: ^3.0.2
     rxjs: ^7.5.7
     source-map-support: ^0.5.21
     sqlite: ^4.1.2
-    sqlite-async: ^1.1.5
     sqlite3: ^5.1.1
     supertest: ^6.2.4
     ts-jest: 29.0.3
@@ -5767,6 +5767,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"python-shell@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "python-shell@npm:3.0.1"
+  checksum: 6140f1f7323fd2ce74250b6d379677c91177b3914f4cdac07ab7858c8ffe1b87518273657b7d50ea2c9e76328384fe54c6756a8076420d7497151bcd5c7a3163
+  languageName: node
+  linkType: hard
+
 "qs@npm:6.10.3":
   version: 6.10.3
   resolution: "qs@npm:6.10.3"
@@ -6299,16 +6306,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sqlite-async@npm:^1.1.5":
-  version: 1.1.5
-  resolution: "sqlite-async@npm:1.1.5"
-  dependencies:
-    sqlite3: ^5.0.11
-  checksum: ffe47da9ae5f9a6c167f3658e76aadbc8b55b3a25ae5d645ea3a1252691c990b1d12ed72d358ea74af43b9ca8c5b5727ea46bb1bf6a3e69b3f615fcec1deea98
-  languageName: node
-  linkType: hard
-
-"sqlite3@npm:^5.0.11, sqlite3@npm:^5.1.1":
+"sqlite3@npm:^5.1.1":
   version: 5.1.1
   resolution: "sqlite3@npm:5.1.1"
   dependencies:

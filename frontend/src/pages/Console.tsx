@@ -19,17 +19,13 @@ import {
   ChevronIcon,
   CogIcon,
   HomeIcon,
-  HospitalIcon,
-  IdentificationIcon,
   KeyIcon,
-  MedicationIcon,
   PencilIcon,
-  SupportIcon,
 } from "@components/Icons";
 import { useEffect, useRef, useState } from "react";
-import { DataViewer } from "@components/DataViewer";
 import { useTranslation } from "react-i18next";
 import { LanguageSelector } from "@components/LanguageSelector";
+import AddJobPage from "./AddJobPage";
 
 const ConsolePage = () => {
   const { t } = useTranslation("console");
@@ -152,6 +148,7 @@ const ConsolePage = () => {
         <Routes location={location} key={location.pathname}>
           <Route path="" element={<Navigate to="jobs" replace />} />
           <Route path="jobs" element={<JobsPage />} />
+          <Route path="jobs/add" element={<AddJobPage />} />
         </Routes>
       </AnimatePresence>
     </MainLayout>

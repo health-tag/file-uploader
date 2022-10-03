@@ -1,14 +1,11 @@
 import Button from "@components/Button";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-
-type Jobs = {
-  id: string;
-  name: string;
-  type: "csop" | "43folders";
-  date: Date;
-  files: Array<string>;
-};
+import { Job } from "@shared/models/job";
+import { JobAPI } from "services/JobService";
+import { useEffect } from "react";
+import { PencilIcon } from "@components/Icons";
+import { useNavigate } from "react-router-dom";
 
 type BundleResult = {
   statusCode: number;
@@ -161,25 +158,31 @@ const JobViewer = ({ job }) => {
           <Button mode="secondary">Log</Button>
         </div>
       </div>
-      { isOpen && <div></div>}
+      {isOpen && <div></div>}
     </div>
   );
 };
 
 const JobsPage = () => {
   const { t } = useTranslation("jobspage");
-  const jobs: Array<Jobs> = [
-    {
-      id: "1",
-      name: "",
-      type: "csop",
-      date: new Date(),
-      files: ["BILLSTRANS.xml", "BILLSOPS.xml"],
-    },
-  ];
+  const navigate = useNavigate();
+  const [jobs, setJobs] = useState<Array<Job>>(new Array<Job>());
+
+  useEffect(() => {
+    (async () => {
+      let jobs = await JobAPI.getJobsAsync();
+      setJobs(jobs);
+    })();
+  }, []);
   return (
     <div>
-      <h1>{t("jobs")}</h1>
+      <div className="page-t flex flex-row items-center">
+        <h1 className="flex-1">{t("jobs")}</h1>
+        <Button mode="primary" onClick={()=>navigate("/jobs/add")}>
+          <PencilIcon />
+          {t("addJob")}
+        </Button>
+      </div>
       {jobs.map((job, i) => (
         <JobViewer key={i} job={job} />
       ))}
