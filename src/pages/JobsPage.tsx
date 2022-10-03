@@ -1,3 +1,4 @@
+import Button from "@components/Button";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -143,14 +144,24 @@ const JobViewer = ({ job }) => {
   const { t } = useTranslation("jobspage");
   return (
     <div className="card p-3">
-        <div className="bg-primary-gradient text-white uppercase inline-block rounded-md py-1 px-2">{job.type}</div>
-      <h3>{job.name}</h3>
-      <div className="text-gray-400">{job.id}</div>
-      <div>{job.date.toLocaleDateString()}</div>
-      <div className="text-bold">{t("files")}</div>
-      {job.files.map((file, i) => (
-        <div>{file}</div>
-      ))}
+      <div className="flex flex-col">
+        <div className="flex-1">
+          <div className="bg-primary-gradient text-white uppercase inline-block rounded-md py-1 px-2">
+            {job.type}
+          </div>
+          <h3>{job.name}</h3>
+          <div className="text-gray-400">{job.id}</div>
+          <div>{job.date.toLocaleDateString()}</div>
+          <div className="text-bold">{t("files")}</div>
+          {job.files.map((file, i) => (
+            <div>{file}</div>
+          ))}
+        </div>
+        <div>
+          <Button mode="secondary">Log</Button>
+        </div>
+      </div>
+      { isOpen && <div></div>}
     </div>
   );
 };
@@ -169,7 +180,9 @@ const JobsPage = () => {
   return (
     <div>
       <h1>{t("jobs")}</h1>
-      {jobs.map((job, i) => <JobViewer key={i} job={job} />)}
+      {jobs.map((job, i) => (
+        <JobViewer key={i} job={job} />
+      ))}
     </div>
   );
 };
