@@ -6374,12 +6374,12 @@ __metadata:
     autoprefixer: ^10.4.12
     axios: ^0.27.2
     cra-template-typescript: 1.2.0
-    framer-motion: ^7.5.0
+    framer-motion: ^7.5.1
     i18next: ^21.9.2
     i18next-browser-languagedetector: ^6.1.5
     i18next-http-backend: ^1.4.4
     lottie-react: ^2.3.1
-    postcss: ^8.4.16
+    postcss: ^8.4.17
     postcss-import: ^15.0.0
     react: ^18.2.0
     react-cool-inview: ^3.0.1
@@ -6581,9 +6581,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:^7.5.0":
-  version: 7.5.0
-  resolution: "framer-motion@npm:7.5.0"
+"framer-motion@npm:^7.5.1":
+  version: 7.5.1
+  resolution: "framer-motion@npm:7.5.1"
   dependencies:
     "@emotion/is-prop-valid": ^0.8.2
     "@motionone/dom": 10.13.1
@@ -6598,7 +6598,7 @@ __metadata:
   dependenciesMeta:
     "@emotion/is-prop-valid":
       optional: true
-  checksum: ce0a55d02274c2d523f78df143bacd714d8343f690b8bf8cc71433afe53e72826df94cd6af6f5e2a427ed5e35d143210ec04be01b45863522930f18321198a95
+  checksum: 7785459f34b09b9c0d6534b39f7a0f5ba5748d061a0d9c5ba68fa1bc5a3e0873205f628347218873948be187b8c4e6f037837a35e73d642ea18c509253dcda02
   languageName: node
   linkType: hard
 
@@ -10595,7 +10595,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.3.5, postcss@npm:^8.4.14, postcss@npm:^8.4.16, postcss@npm:^8.4.4, postcss@npm:^8.4.7":
+"postcss@npm:^8.3.5, postcss@npm:^8.4.14, postcss@npm:^8.4.4, postcss@npm:^8.4.7":
   version: 8.4.16
   resolution: "postcss@npm:8.4.16"
   dependencies:
@@ -10603,6 +10603,17 @@ __metadata:
     picocolors: ^1.0.0
     source-map-js: ^1.0.2
   checksum: 10eee25efd77868036403858577da0cefaf2e0905feeaba5770d5438ccdddba3d01cba8063e96b8aac4c6daa0ed413dd5ae0554a433a3c4db38df1d134cffc1f
+  languageName: node
+  linkType: hard
+
+"postcss@npm:^8.4.17":
+  version: 8.4.17
+  resolution: "postcss@npm:8.4.17"
+  dependencies:
+    nanoid: ^3.3.4
+    picocolors: ^1.0.0
+    source-map-js: ^1.0.2
+  checksum: a6d9096dd711e17f7b1d18ff5dcb4fdedf3941d5a3dc8b0e4ea873b8f31972d57f73d6da9a8aed7ff389eb52190ed34f6a94f299a7f5ddc68b08a24a48f77eb9
   languageName: node
   linkType: hard
 
