@@ -4,8 +4,10 @@ import { useTranslation } from "react-i18next";
 import { Job } from "@shared/models/job";
 import { JobAPI } from "services/JobService";
 import { useEffect } from "react";
-import { PencilIcon } from "@components/Icons";
+import { AcceptIcon, PencilIcon } from "@components/Icons";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { BASE_API_URL } from "App";
 
 type BundleResult = {
   statusCode: number;
@@ -136,25 +138,39 @@ let data: Array<BundleResult> = JSON.parse(`[
     }
    ]`);
 
-const JobViewer = ({ job }) => {
+const JobViewer = ({ job }: { job: Job }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { t } = useTranslation("jobspage");
   return (
     <div className="card p-3">
-      <div className="flex flex-col">
-        <div className="flex-1">
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-row items-center gap-2">
+          <div className="bg-primary-gradient-light-2 text-white uppercase inline-block rounded-md py-1 px-2">
+            {job.status}
+          </div>
           <div className="bg-primary-gradient text-white uppercase inline-block rounded-md py-1 px-2">
             {job.type}
           </div>
-          <h3>{job.name}</h3>
-          <div className="text-gray-400">{job.id}</div>
-          <div>{job.date.toLocaleDateString()}</div>
-          <div className="text-bold">{t("files")}</div>
-          {job.files.map((file, i) => (
-            <div>{file}</div>
-          ))}
+          <span className="text-gray-400">{job.id}</span>
         </div>
+        <h4>
+          {job.dataDate.toLocaleDateString("th-TH", { dateStyle: "full" })}
+        </h4>
+        <div>{job.description}</div>
         <div>
+          <h5 className="text-bold">{t("files")}</h5>
+          <ol>
+            {job.files.map((file, i) => (
+              <li key={i}>{file}</li>
+            ))}
+          </ol>
+          <div></div>
+          <Button
+            mode="secondary"
+            onClick={() => axios.get(`${BASE_API_URL}/job/${job.id}/queue`)}
+          >
+            Queue
+          </Button>
           <Button mode="secondary">Log</Button>
         </div>
       </div>
@@ -178,9 +194,16 @@ const JobsPage = () => {
     <div>
       <div className="page-t flex flex-row items-center">
         <h1 className="flex-1">{t("jobs")}</h1>
-        <Button mode="primary" onClick={()=>navigate("/jobs/add")}>
+        <Button mode="primary" onClick={() => navigate("/jobs/add")}>
           <PencilIcon />
           {t("addJob")}
+        </Button>
+        <Button
+          mode="primary"
+          onClick={() => axios.get(`${BASE_API_URL}/job/start`)}
+        >
+          <AcceptIcon />
+          Start
         </Button>
       </div>
       {jobs.map((job, i) => (

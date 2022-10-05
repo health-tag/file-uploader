@@ -4,7 +4,13 @@
   "addJob": "เพิ่มงาน",
   "addPage": {
     "title": "เพิ่มงาน",
-    "dataDate": "วันที่ของข้อมูล",
-    "description": "คำอธิบายงาน"
+    "submit": "อัพโหลด",
+    "dataDate": "วันที่ของข้อมูล*",
+    "dataDateRequired": "ต้องระบุวันที่ของข้อมูล",
+    "fileRequired": "ต้องระบุไฟล์ที่จะอัพโหลด",
+    "description": "คำอธิบายงาน",
+    "descriptionPlaceholder": "คำอธิบายสั้นๆ เกี่ยวกับข้อมูลนี้",
+    "encoding": "การเข้ารหัสตัวอักษร",
+    "selectFile": "เลือกไฟล์"
   }
 }

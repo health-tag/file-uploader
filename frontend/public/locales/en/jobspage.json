@@ -1,0 +1,16 @@
+{
+  "jobs": "Jobs",
+  "files": "Files",
+  "addJob": "Add job",
+  "addPage": {
+    "title": "Add a new job",
+    "submit": "Upload",
+    "dataDate": "Data date*",
+    "dataDateRequired": "Must specify the date of this data",
+    "fileRequired": "Must specify the file to be uploaded",
+    "description": "Description",
+    "descriptionPlaceholder": "Short description of this dataset",
+    "encoding": "Encoding",
+    "selectFile": "Select a file"
+  }
+}

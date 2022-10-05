@@ -1,12 +1,19 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { JobService } from '@services/job.service';
 import { JobController } from 'controllers/job/job.controller';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { join } from 'path';
 
 @Module({
-  imports: [],
-  controllers: [AppController, JobController],
-  providers: [AppService, JobService],
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, 'client'),
+      exclude: ['/api*'],
+    }),
+    HttpModule,
+  ],
+  controllers: [JobController],
+  providers: [JobService],
 })
 export class AppModule {}

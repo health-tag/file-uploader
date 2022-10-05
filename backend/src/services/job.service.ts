@@ -26,36 +26,34 @@ export class JobService {
   async addJobAsync(job: JobEntity) {
     let r = await this.db.run(
       `INSERT INTO jobs(id,data,concurrency_token) VALUES(?,json_insert(?),hex(randomblob(16)));`,
-      [job.id, job],
+      [job.id, JSON.stringify(job)],
     );
     console.log(`Rows inserted ${r.changes}`);
   }
 
   async getJobAsync(jobId: string): Promise<Job> {
-    let r: Array<{ id: string; data: JobEntity; status: string }> =
+    let r: Array<{ id: string; data: string; status: string }> =
       await this.db.all(`SELECT * FROM jobs WHERE id = ?;`, [jobId]);
     return r.map((r) => {
       let job: Job = {
         status: r.status,
-        ...r.data,
+        ...JSON.parse(r.data),
       };
       return job;
     })[0];
   }
 
   async getJobsAsync(): Promise<Array<Job>> {
-    Logger.log("PP")
-    let r: Array<{ id: string; data: JobEntity; status: string }> =
+    let r: Array<{ id: string; data: string; status: string }> =
       await this.db.all(`SELECT * FROM jobs;`);
-    Logger.log("PP")
-    Logger.log(r)
-    return r.map((r) => {
+    let mapped = r.map((r) => {
       let job: Job = {
         status: r.status,
-        ...r.data,
+        ...JSON.parse(r.data),
       };
       return job;
     });
+    return mapped;
   }
 
   async deleteJobAsync(jobId: string) {
@@ -63,18 +61,37 @@ export class JobService {
     console.log(`Rows deleted ${r.changes}`);
   }
 
-  async runJobAsync(jobId: string) {
-    PythonShell.run(
-      './python/fhir-transformer/__main__.py',
-      {
-        mode: 'text',
-        pythonOptions: ['-u'], // get print results in real-time
-      },
-      function (err, results) {
-        if (err) throw err;
-        // results is an array consisting of messages collected during execution
-        console.log('results: %j', results);
-      },
+  async updateJobAsync(job: JobEntity) {
+    let old: Array<{
+      id: string;
+      data: string;
+      status: string;
+      concurrency_token: string;
+    }> = await this.db.all(`SELECT * FROM jobs WHERE id = ?;`, [job.id]);
+
+    if (old.length == 0) throw new Error('entity not found');
+
+    let r = await this.db.run(
+      `UPDATE jobs SET data = ?, concurrency_token = hex(randomblob(16)) WHERE id = ? AND concurrency_token = ?;`,
+      [JSON.stringify(job), job.id, old[0].concurrency_token],
     );
+    console.log(`Rows updated ${r.changes}`);
+  }
+
+  async updateJobStateAsync(jobId: string, status: string) {
+    let old: Array<{
+      id: string;
+      data: string;
+      status: string;
+      concurrency_token: string;
+    }> = await this.db.all(`SELECT * FROM jobs WHERE id = ?;`, [jobId]);
+
+    if (old.length == 0) throw new Error('entity not found');
+
+    let r = await this.db.run(
+      `UPDATE jobs SET status = ?, concurrency_token = hex(randomblob(16)) WHERE id = ? AND concurrency_token = ?;`,
+      [status, jobId, old[0].concurrency_token],
+    );
+    console.log(`Rows status updated ${r.changes}`);
   }
 }
