@@ -1,0 +1,10 @@
+import { FSWatcher, watch } from 'chokidar';
+export class WatcherService {
+  private watcher: FSWatcher;
+  constructor() {
+    this.watcher = watch('./workingdir/**', {
+      ignored: /(^|[\/\\])\../, // ignore dotfiles
+      persistent: true,
+    });
+  }
+}

@@ -4,143 +4,29 @@ import { useTranslation } from "react-i18next";
 import { Job } from "@shared/models/job";
 import { JobAPI } from "services/JobService";
 import { useEffect } from "react";
-import { AcceptIcon, PencilIcon } from "@components/Icons";
+import { PencilIcon } from "@components/Icons";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_API_URL } from "App";
-
-type BundleResult = {
-  statusCode: number;
-  entries: Array<EntryResult>;
-};
-
-type EntryResult = {
-  resourceName: string;
-  description: string;
-  status: string | undefined | null;
-  location: string | undefined | null;
-};
-
-let data: Array<BundleResult> = JSON.parse(`[
-    {
-     "statusCode": 200,
-     "entries": [
-      {
-       "resourceName": "Organization",
-       "description": "Organization/0xC88a594dBB4e9F1ce15d59D0ED129b92E6d89884",
-       "status": "200 OK",
-       "location": "Organization/0xC88a594dBB4e9F1ce15d59D0ED129b92E6d89884/_history/1"
-      }
-     ]
-    },
-    {
-     "statusCode": 200,
-     "entries": [
-      {
-       "resourceName": "Location",
-       "description": "Location?identifier=https://sil-th.org/CSOP/station|001",
-       "status": "200 OK",
-       "location": "Location/2/_history/1"
-      }
-     ]
-    },
-    {
-     "statusCode": 200,
-     "entries": [
-      {
-       "resourceName": "Practitioner",
-       "description": "Practitioner?identifier=https://www.tmc.or.th|45842",
-       "status": "200 OK",
-       "location": "Practitioner/3/_history/1"
-      }
-     ]
-    },
-    {
-     "statusCode": 200,
-     "entries": [
-      {
-       "resourceName": "Patient",
-       "description": "Patient?identifier=https://sil-th.org/CSOP/hn|500000000",
-       "status": "200 OK",
-       "location": "Patient/4/_history/1"
-      }
-     ]
-    },
-    {
-     "statusCode": 200,
-     "entries": [
-      {
-       "resourceName": "Encounter",
-       "description": "Encounter/O-NM2-3142-00000004",
-       "status": "200 OK",
-       "location": "Encounter/5/_history/1"
-      },
-      {
-       "resourceName": "Encounter",
-       "description": "Encounter/O-NM2-3142-00000004",
-       "status": "200 OK",
-       "location": "Encounter/5/_history/1"
-      },
-      {
-       "resourceName": "Encounter",
-       "description": "Encounter/O-NM2-3142-00000004",
-       "status": "200 OK",
-       "location": "Encounter/5/_history/1"
-      },
-      {
-       "resourceName": "Encounter",
-       "description": "Encounter/O-NM2-3142-00000004",
-       "status": "200 OK",
-       "location": "Encounter/5/_history/1"
-      },
-      {
-       "resourceName": "Encounter",
-       "description": "Encounter/O-NM2-3142-00000004",
-       "status": "200 OK",
-       "location": "Encounter/5/_history/1"
-      }
-     ]
-    },
-    {
-     "statusCode": 200,
-     "entries": [
-      {
-       "resourceName": "MedicationDispense",
-       "description": "MedicationDispense/O-NM2-3142-00000004|ASPT8",
-       "status": "200 OK",
-       "location": "MedicationDispense/6/_history/1"
-      },
-      {
-       "resourceName": "MedicationDispense",
-       "description": "MedicationDispense/O-NM2-3142-00000004|ATET5",
-       "status": "200 OK",
-       "location": "MedicationDispense/7/_history/1"
-      },
-      {
-       "resourceName": "MedicationDispense",
-       "description": "MedicationDispense/O-NM2-3142-00000004|ATOTL40",
-       "status": "200 OK",
-       "location": "MedicationDispense/8/_history/1"
-      },
-      {
-       "resourceName": "MedicationDispense",
-       "description": "MedicationDispense/O-NM2-3142-00000004|LOSTZ5",
-       "status": "200 OK",
-       "location": "MedicationDispense/9/_history/1"
-      },
-      {
-       "resourceName": "MedicationDispense",
-       "description": "MedicationDispense/O-NM2-3142-00000004|OMETM",
-       "status": "200 OK",
-       "location": "MedicationDispense/10/_history/1"
-      }
-     ]
-    }
-   ]`);
+import { BundleResult } from "@shared/models/result";
 
 const JobViewer = ({ job }: { job: Job }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isLogOpen, setIsLogOpen] = useState<boolean>(false);
+  const [isResultOpen, setIsResultOpen] = useState<boolean>(false);
   const { t } = useTranslation("jobspage");
+  const [log, setLog] = useState("");
+  const [results, setResults] = useState<Array<BundleResult> | null>(null);
+
+  const getLog = async () => {
+    let r = await JobAPI.getJobLogAsync(job.id);
+    setLog(r);
+  };
+
+  const getResult = async () => {
+    let r = await JobAPI.getJobResultAsync(job.id);
+    setResults(r);
+  };
+
   return (
     <div className="card p-3">
       <div className="flex flex-col gap-2">
@@ -164,17 +50,28 @@ const JobViewer = ({ job }: { job: Job }) => {
               <li key={i}>{file}</li>
             ))}
           </ol>
-          <div></div>
-          <Button
-            mode="secondary"
-            onClick={() => axios.get(`${BASE_API_URL}/job/${job.id}/queue`)}
-          >
-            Queue
+          <Button mode="secondary" onClick={() => getLog()}>
+            Log
           </Button>
-          <Button mode="secondary">Log</Button>
+          <Button mode="secondary" onClick={() => getResult()}>
+            Result
+          </Button>
         </div>
       </div>
-      {isOpen && <div></div>}
+      {isLogOpen && <div></div>}
+      {isResultOpen && (
+        <div>
+          <p className="text-sm"></p>
+          <table className="table-style-one">
+            <thead>
+              <th>ResourceName</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Location</th>
+            </thead>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
@@ -197,13 +94,6 @@ const JobsPage = () => {
         <Button mode="primary" onClick={() => navigate("/jobs/add")}>
           <PencilIcon />
           {t("addJob")}
-        </Button>
-        <Button
-          mode="primary"
-          onClick={() => axios.get(`${BASE_API_URL}/job/start`)}
-        >
-          <AcceptIcon />
-          Start
         </Button>
       </div>
       {jobs.map((job, i) => (

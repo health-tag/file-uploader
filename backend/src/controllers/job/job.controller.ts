@@ -17,7 +17,7 @@ import { promises as fsp } from 'fs';
 import { diskStorage } from 'multer';
 import { randomUUID } from 'crypto';
 
-let FLASK_URL = "http://python:105/api"
+let FLASK_URL = 'http://python:105/api';
 
 @Controller('api/job')
 export class JobController {
@@ -44,27 +44,17 @@ export class JobController {
     job.type = jobDto.type;
     job.dataDate = new Date(jobDto.dataDate);
     job.taskDate = new Date();
-
-    let targetDir = `./workingdir/uploads/${id}`;
-    await fsp.mkdir(targetDir, { recursive: true });
-    for (var file of files) {
-      let newfilePath = `${targetDir}/${file.originalname}`;
-      await fsp.rename(file.path, newfilePath);
-      job.files.push(file.originalname);
-    }
-    await this.jobService.addJobAsync(job);
+    await this.jobService.addJobAsync(files, job);
   }
 
   @Delete()
   deleteJob(@Param('id') id: string) {
     this.jobService.deleteJobAsync(id);
   }
-
+/*
   @Get(':id/queue')
   async queueJob(@Param('id') id: string) {
-    let r = await this.httpService.axiosRef.get(
-      `${FLASK_URL}/queue/${id}`,
-    );
+    let r = await this.httpService.axiosRef.get(`${FLASK_URL}/queue/${id}`);
     console.log(r.statusText);
     console.log(r.data);
     this.jobService.updateJobStateAsync(id, 'queue');
@@ -72,9 +62,7 @@ export class JobController {
 
   @Get('/start')
   async startQueue() {
-    let r = await this.httpService.axiosRef.get(
-      `${FLASK_URL}/start`,
-    );
+    let r = await this.httpService.axiosRef.get(`${FLASK_URL}/start`);
     console.log(r.statusText);
     console.log(r.data);
   }
@@ -88,10 +76,20 @@ export class JobController {
   finishJob(@Param('id') id: string) {
     this.jobService.updateJobStateAsync(id, 'finish');
   }
-
+*/
   @Get(':id')
   getJob(@Param('id') id: string): Promise<Job> {
     return this.jobService.getJobAsync(id);
+  }
+
+  @Get(':id/log')
+  getJobLog(@Param('id') id: string): Promise<string> {
+    return this.jobService.getJobLogAsync(id);
+  }
+
+  @Get(':id/result')
+  getJobResult(@Param('id') id: string): Promise<string> {
+    return this.jobService.getJobResultAsync(id);
   }
 
   @Get()

@@ -1,67 +1,80 @@
 import { Injectable } from '@nestjs/common';
 import { Job, JobEntity } from '@shared/models/job';
-import { Database, open } from 'sqlite';
-import * as sqlite from 'sqlite3';
-import { PythonShell } from 'python-shell';
-import { Logger } from '@nestjs/common';
+import { promises as fsp } from 'fs';
+import { basename } from 'path';
+
+async function exists(path) {
+  try {
+    await fsp.access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 @Injectable()
 export class JobService {
-  private db: Database<sqlite.Database, sqlite.Statement>;
 
-  constructor() {
-    (async () => {
-      this.db = await open({
-        filename: './workingdir/jobs.db',
-        driver: sqlite.verbose().Database,
-      });
-      await this.db.run(`CREATE TABLE IF NOT EXISTS jobs(
-        id TEXT PRIMARY KEY,
-        data TEXT NOT NULL,
-        status TEXT DEFAULT "not-start" NOT NULL,
-        concurrency_token TEXT NOT NULL
-        );`);
-    })();
-  }
-
-  async addJobAsync(job: JobEntity) {
-    let r = await this.db.run(
-      `INSERT INTO jobs(id,data,concurrency_token) VALUES(?,json_insert(?),hex(randomblob(16)));`,
-      [job.id, JSON.stringify(job)],
-    );
-    console.log(`Rows inserted ${r.changes}`);
+  async addJobAsync(files: Array<Express.Multer.File>, job: JobEntity) {
+    let targetDir = `./workingdir/uploads/${job.id}`;
+    await fsp.mkdir(targetDir, { recursive: true });
+    for (var file of files) {
+      let newfilePath = `${targetDir}/${file.originalname}`;
+      await fsp.rename(file.path, newfilePath);
+      job.files.push(file.originalname);
+    }
+    await fsp.writeFile(`${targetDir}/info.json`, JSON.stringify(job), {
+      encoding: 'utf-8',
+    });
+    await fsp.writeFile(`${targetDir}/${job.type}`, '');
+    console.log(`Create ${job.type} job at ${targetDir}`);
   }
 
   async getJobAsync(jobId: string): Promise<Job> {
-    let r: Array<{ id: string; data: string; status: string }> =
-      await this.db.all(`SELECT * FROM jobs WHERE id = ?;`, [jobId]);
-    return r.map((r) => {
-      let job: Job = {
-        status: r.status,
-        ...JSON.parse(r.data),
-      };
-      return job;
-    })[0];
+    let targetDir = `./workingdir/uploads/${jobId}`;
+    let job = JSON.parse(
+      await fsp.readFile(`${targetDir}/info.json`, { encoding: 'utf-8' }),
+    ) as Job;
+    if (exists(`${targetDir}/done`)) {
+      job.status = 'done';
+    } else if (exists(`${targetDir}/error`)) {
+      job.status = 'error';
+    } else {
+      job.status = 'pending';
+    }
+    return job;
+  }
+
+  getJobLogAsync(jobId: string): Promise<string> {
+    let targetDir = `./workingdir/uploads/${jobId}`;
+    return fsp.readFile(`${targetDir}/log.txt`, {encoding:"utf-8"});
+  }
+
+  getJobResultAsync(jobId: string): Promise<string> {
+    let targetDir = `./workingdir/uploads/${jobId}`;
+    return fsp.readFile(`${targetDir}/result.json`, {encoding:"utf-8"});
   }
 
   async getJobsAsync(): Promise<Array<Job>> {
-    let r: Array<{ id: string; data: string; status: string }> =
-      await this.db.all(`SELECT * FROM jobs;`);
-    let mapped = r.map((r) => {
-      let job: Job = {
-        status: r.status,
-        ...JSON.parse(r.data),
-      };
-      return job;
-    });
-    return mapped;
+    let jobs = new Array<Job>();
+    for (let subdir of await fsp.readdir('./workingdir/uploads/')) {
+      try {
+        let job = await this.getJobAsync(basename(subdir));
+        jobs.push(job);
+      } catch (err) {
+        console.log(err)
+      }
+    }
+    return jobs;
   }
 
   async deleteJobAsync(jobId: string) {
-    let r = await this.db.run(`DELETE FROM jobs WHERE id = ?;`, [jobId]);
-    console.log(`Rows deleted ${r.changes}`);
+    let targetDir = `./workingdir/uploads/${jobId}`;
+    fsp.rm(targetDir, { recursive: true, force: true });
+    console.log(`Delete job at ${targetDir}`);
   }
 
-  async updateJobAsync(job: JobEntity) {
+  /*async updateJobAsync(job: JobEntity) {
     let old: Array<{
       id: string;
       data: string;
@@ -93,5 +106,5 @@ export class JobService {
       [status, jobId, old[0].concurrency_token],
     );
     console.log(`Rows status updated ${r.changes}`);
-  }
+  }*/
 }
