@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   Param,
   Logger,
+  StreamableFile,
 } from '@nestjs/common';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { JobService } from '@services/job.service';
@@ -83,12 +84,12 @@ export class JobController {
   }
 
   @Get(':id/log')
-  getJobLog(@Param('id') id: string): Promise<string> {
+  getJobLog(@Param('id') id: string): StreamableFile {
     return this.jobService.getJobLogAsync(id);
   }
 
   @Get(':id/result')
-  getJobResult(@Param('id') id: string): Promise<string> {
+  getJobResult(@Param('id') id: string): StreamableFile {
     return this.jobService.getJobResultAsync(id);
   }
 

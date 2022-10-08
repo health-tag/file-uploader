@@ -3979,14 +3979,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "axios@npm:1.1.0"
+"axios@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "axios@npm:1.1.2"
   dependencies:
     follow-redirects: ^1.15.0
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
-  checksum: e26df8edaf953640b331638886725335ad57a3b786a13aa93c5ac33f7edfa691026c31d42e88defef5709196978c7a449a4c556937a63037b21216ab7b169b1e
+  checksum: 136c25a5031aa2845fdbda3006c36888bbe351b11d1195f1f898a23c5df1430febbdb1ad034a61f27967e83762d5b5a3e851fff8a363cb4badeb883f8ff21461
   languageName: node
   linkType: hard
 
@@ -6390,11 +6390,11 @@ __metadata:
     "@types/react": ^18.0.21
     "@types/react-dom": ^18.0.6
     autoprefixer: ^10.4.12
-    axios: ^1.1.0
+    axios: ^1.1.2
     cra-template-typescript: 1.2.0
-    framer-motion: ^7.5.2
+    framer-motion: ^7.5.3
     i18next: ^21.10.0
-    i18next-browser-languagedetector: ^6.1.6
+    i18next-browser-languagedetector: ^6.1.8
     i18next-http-backend: ^1.4.4
     lottie-react: ^2.3.1
     postcss: ^8.4.17
@@ -6599,9 +6599,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:^7.5.2":
-  version: 7.5.2
-  resolution: "framer-motion@npm:7.5.2"
+"framer-motion@npm:^7.5.3":
+  version: 7.5.3
+  resolution: "framer-motion@npm:7.5.3"
   dependencies:
     "@emotion/is-prop-valid": ^0.8.2
     "@motionone/dom": 10.13.1
@@ -6616,7 +6616,7 @@ __metadata:
   dependenciesMeta:
     "@emotion/is-prop-valid":
       optional: true
-  checksum: 8c7f664e758ee351270dcce373a7d5a55230d6cd45abf57df95ee6641f6130b1a38c106949443053ba7724d0216b654a708da6feb88f5486aca8ed0fbf826f7e
+  checksum: 5b038ecb44e355916cef2310a1f0df7937f7e38e36b91e35a1dc0425b7717f8e5dd76b5cbf0acd38b81027ba0d8fc33d9148d901ecee7017adc76e2ae466bfea
   languageName: node
   linkType: hard
 
@@ -7243,12 +7243,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-browser-languagedetector@npm:^6.1.6":
-  version: 6.1.6
-  resolution: "i18next-browser-languagedetector@npm:6.1.6"
+"i18next-browser-languagedetector@npm:^6.1.8":
+  version: 6.1.8
+  resolution: "i18next-browser-languagedetector@npm:6.1.8"
   dependencies:
     "@babel/runtime": ^7.19.0
-  checksum: 9ae55358d27a469fc826bf3246f5f17dfbdb1dcd0641f21258131d6366bd46673981d9fe5583b37fe1dfa5a73ff7694939c42ccbed4488c6a06dcaf8307f5bf9
+  checksum: dd84d3c9cb693a70662436b06f5554898815df33b7641249a64876c74c38960f11ef17b4d7f49ee2da7262abe0f3ae73abe7f3a3b435a344d0d07e4ca7cb24c6
   languageName: node
   linkType: hard
 

@@ -10,6 +10,8 @@ import axios from "axios";
 import { BASE_API_URL } from "App";
 import { BundleResult, EntryResult } from "@shared/models/result";
 
+const FHIR_SERVER_URL = "http://localhost:8080/fhir";
+
 const transformResult = (results: Array<BundleResult>) => {
   let entries = results?.flatMap((r) => r.entries);
   let entriesCount = entries.length;
@@ -35,7 +37,7 @@ const JobViewer = ({ job }: { job: Job }) => {
   const [isLogOpen, setIsLogOpen] = useState<boolean>(false);
   const [isResultOpen, setIsResultOpen] = useState<boolean>(false);
   const { t } = useTranslation("jobspage");
-  const [log, setLog] = useState("");
+  const [log, setLog] = useState<string | null>(null);
   const [results, setResults] = useState<{
     successCount: number;
     entriesCount: number;
@@ -43,20 +45,41 @@ const JobViewer = ({ job }: { job: Job }) => {
   } | null>(null);
 
   const getLog = async () => {
-    let r = await JobAPI.getJobLogAsync(job.id);
-    setLog(r);
+    if (log == null) {
+      let r = await JobAPI.getJobLogAsync(job.id);
+      setLog(r);
+    }
+    setIsLogOpen((old) => !old);
   };
 
   const getResult = async () => {
-    let r = await JobAPI.getJobResultAsync(job.id);
-    setResults(transformResult(r));
+    if (results == null) {
+      let r = await JobAPI.getJobResultAsync(job.id);
+      setResults(transformResult(r));
+    }
+    setIsResultOpen((old) => !old);
+  };
+
+  const getJobStatusCSS = (status: String) => {
+    switch (status) {
+      case "done":
+        return "bg-lime-300";
+      case "error":
+        return "bg-orange-300";
+      default:
+        return "bg-gray-100";
+    }
   };
 
   return (
     <div className="card p-3">
       <div className="flex flex-col gap-2">
         <div className="flex flex-row items-center gap-2">
-          <div className="bg-primary-gradient-light-2 text-white uppercase inline-block rounded-md py-1 px-2">
+          <div
+            className={`${getJobStatusCSS(
+              job.status
+            )} uppercase inline-block rounded-md py-1 px-2`}
+          >
             {job.status}
           </div>
           <div className="bg-primary-gradient text-white uppercase inline-block rounded-md py-1 px-2">
@@ -70,42 +93,69 @@ const JobViewer = ({ job }: { job: Job }) => {
         <div>{job.description}</div>
         <div>
           <h5 className="text-bold">{t("files")}</h5>
-          <ol>
+          <ol className="my-3 p-3 rounded-lg bg-slate-100 list-decimal">
             {job.files.map((file, i) => (
-              <li key={i}>{file}</li>
+              <li key={i} className="ml-3">
+                {file}
+              </li>
             ))}
           </ol>
           <Button mode="secondary" onClick={() => getLog()}>
             Log
           </Button>
-          <Button mode="secondary" onClick={() => getResult()}>
+          <Button className="ml-3" mode="secondary" onClick={() => getResult()}>
             Result
           </Button>
         </div>
       </div>
-      {isLogOpen && <div></div>}
+      {isLogOpen && (
+        <div
+          className="my-3 p-3 rounded-lg bg-slate-800 text-white whitespace-pre-line"
+          dangerouslySetInnerHTML={{ __html: log as string }}
+        ></div>
+      )}
       {isResultOpen && (
-        <div>
-          <p className="text-sm">
+        <div className="my-3">
+          <p className="my-1 text-sm">
             <b>Location</b> คือ URL ของ FHIR Resource สามารถใช้ URL
             นี้ในการเข้าดู FHIR Resource บน FHIR Server ได้
           </p>
           <div className="flex flex-row gap-3">
             <div className="p-3">
-              <div className="text-2xl">{}</div>
-              <div>/{}</div>
-              <div></div>
+              <div className="text-2xl">{results?.successCount}</div>
+              <div>/{results?.entriesCount}</div>
+              <div>จำนวนการส่งข้อมูลที่สำเร็จ</div>
             </div>
           </div>
-          <table className="table-style-one">
-            <thead>
-              <th>ResourceName</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th>Location</th>
-            </thead>
-            <tbody>{}</tbody>
-          </table>
+          {results?.entries.groupBy("resourceName").map((g) => (
+            <>
+              <h5>{g.key}</h5>
+              <table className="table-style-1">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Location</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {g.value.map((e) => (
+                    <tr>
+                      <td>{e.description}</td>
+                      <td>{e.status}</td>
+                      <td>
+                        {e.location != null && (
+                          <a href={`${FHIR_SERVER_URL}/${e.location}`}>
+                            {e.location}
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          ))}
         </div>
       )}
     </div>

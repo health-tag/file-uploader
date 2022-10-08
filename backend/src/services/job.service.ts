@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, StreamableFile } from '@nestjs/common';
 import { Job, JobEntity } from '@shared/models/job';
-import { promises as fsp } from 'fs';
-import { basename } from 'path';
+import { createReadStream, promises as fsp } from 'fs';
+import { basename, join } from 'path';
 
 async function exists(path) {
   try {
@@ -45,14 +45,18 @@ export class JobService {
     return job;
   }
 
-  getJobLogAsync(jobId: string): Promise<string> {
+  getJobLogAsync(jobId: string): StreamableFile {
     let targetDir = `./workingdir/uploads/${jobId}`;
-    return fsp.readFile(`${targetDir}/log.txt`, {encoding:"utf-8"});
+    const file = createReadStream(join(targetDir, 'log.txt'));
+    return new StreamableFile(file);
+    //return fsp.readFile(`${targetDir}/log.txt`, {encoding:"utf-8"});
   }
 
-  getJobResultAsync(jobId: string): Promise<string> {
+  getJobResultAsync(jobId: string): StreamableFile {
     let targetDir = `./workingdir/uploads/${jobId}`;
-    return fsp.readFile(`${targetDir}/result.json`, {encoding:"utf-8"});
+    const file = createReadStream(join(targetDir, 'result.json'));
+    return new StreamableFile(file);
+    //return fsp.readFile(`${targetDir}/result.json`, {encoding:"utf-8"});
   }
 
   async getJobsAsync(): Promise<Array<Job>> {
