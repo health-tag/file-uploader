@@ -8,14 +8,39 @@ import { PencilIcon } from "@components/Icons";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_API_URL } from "App";
-import { BundleResult } from "@shared/models/result";
+import { BundleResult, EntryResult } from "@shared/models/result";
+
+const transformResult = (results: Array<BundleResult>) => {
+  let entries = results?.flatMap((r) => r.entries);
+  let entriesCount = entries.length;
+  let successCount = entries
+    ?.map((e): number => {
+      try {
+        return parseInt((e.status as string).replace(/\D/, "")) < 400 ? 1 : 0;
+      } catch (err) {
+        return 0;
+      }
+    })
+    .reduce((acc, current) => {
+      return acc + current;
+    });
+  return {
+    successCount,
+    entriesCount,
+    entries,
+  };
+};
 
 const JobViewer = ({ job }: { job: Job }) => {
   const [isLogOpen, setIsLogOpen] = useState<boolean>(false);
   const [isResultOpen, setIsResultOpen] = useState<boolean>(false);
   const { t } = useTranslation("jobspage");
   const [log, setLog] = useState("");
-  const [results, setResults] = useState<Array<BundleResult> | null>(null);
+  const [results, setResults] = useState<{
+    successCount: number;
+    entriesCount: number;
+    entries: Array<EntryResult>;
+  } | null>(null);
 
   const getLog = async () => {
     let r = await JobAPI.getJobLogAsync(job.id);
@@ -24,7 +49,7 @@ const JobViewer = ({ job }: { job: Job }) => {
 
   const getResult = async () => {
     let r = await JobAPI.getJobResultAsync(job.id);
-    setResults(r);
+    setResults(transformResult(r));
   };
 
   return (
@@ -61,7 +86,17 @@ const JobViewer = ({ job }: { job: Job }) => {
       {isLogOpen && <div></div>}
       {isResultOpen && (
         <div>
-          <p className="text-sm"></p>
+          <p className="text-sm">
+            <b>Location</b> คือ URL ของ FHIR Resource สามารถใช้ URL
+            นี้ในการเข้าดู FHIR Resource บน FHIR Server ได้
+          </p>
+          <div className="flex flex-row gap-3">
+            <div className="p-3">
+              <div className="text-2xl">{}</div>
+              <div>/{}</div>
+              <div></div>
+            </div>
+          </div>
           <table className="table-style-one">
             <thead>
               <th>ResourceName</th>
@@ -69,6 +104,7 @@ const JobViewer = ({ job }: { job: Job }) => {
               <th>Status</th>
               <th>Location</th>
             </thead>
+            <tbody>{}</tbody>
           </table>
         </div>
       )}
