@@ -1,5 +1,5 @@
 FROM node:18-alpine as node
-FROM node as buildserver
+FROM node as buildclient
 WORKDIR /src
 COPY . .
 RUN yarn
