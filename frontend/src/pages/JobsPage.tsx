@@ -100,12 +100,20 @@ const JobViewer = ({ job }: { job: Job }) => {
               </li>
             ))}
           </ol>
-          <Button mode="secondary" onClick={() => getLog()}>
-            Log
-          </Button>
-          <Button className="ml-3" mode="secondary" onClick={() => getResult()}>
-            Result
-          </Button>
+          {job.status != "pending" && (
+            <>
+              <Button mode="secondary" onClick={() => getLog()}>
+                Log
+              </Button>
+              <Button
+                className="ml-3"
+                mode="secondary"
+                onClick={() => getResult()}
+              >
+                Result
+              </Button>
+            </>
+          )}
         </div>
       </div>
       {isLogOpen && (
@@ -182,9 +190,11 @@ const JobsPage = () => {
           {t("addJob")}
         </Button>
       </div>
-      {jobs.map((job, i) => (
-        <JobViewer key={i} job={job} />
-      ))}
+      <section className="flex flex-col gap-3">
+        {jobs.map((job, i) => (
+          <JobViewer key={i} job={job} />
+        ))}
+      </section>
     </div>
   );
 };

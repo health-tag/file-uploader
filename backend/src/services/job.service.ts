@@ -1,15 +1,16 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
 import { Job, JobEntity } from '@shared/models/job';
-import { createReadStream, promises as fsp } from 'fs';
+import { existsSync, createReadStream, promises as fsp } from 'fs';
 import { basename, join } from 'path';
 
-async function exists(path) {
-  try {
-    await fsp.access(path);
+function exists(path) {
+  return existsSync(path);
+  /*try {
+    existsSync(path);
     return true;
   } catch {
     return false;
-  }
+  }*/
 }
 
 @Injectable()
