@@ -73,10 +73,10 @@ const ConsolePage = () => {
         <>
           <hr />
           {/*<motion.h5 variants={menuHeaderAnimationVariants}>ข้อมูล</motion.h5>*/}
-          <NavLink to="jobs">
+          <NavLink to="tasks">
             <>
               <HomeIcon className="h-6" />
-              {t("jobs")}
+              {t("tasks")}
             </>
           </NavLink>
           <hr />
@@ -87,6 +87,7 @@ const ConsolePage = () => {
             <BookOpenIcon />
             {t("manual")}
           </a>
+          {/* 
           <hr />
           <motion.h5 variants={menuHeaderAnimationVariants}>
             {t("setting")}
@@ -97,6 +98,7 @@ const ConsolePage = () => {
               {t("interface")}
             </>
           </NavLink>
+          */}
         </>
       }
       header={
@@ -111,12 +113,12 @@ const ConsolePage = () => {
             </div>
             <div
               className="py-3 hover:cursor-pointer flex items-center text-white gap-1"
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              //onClick={() => setIsProfileOpen(!isProfileOpen)}
             >
               <span>Admin</span>
-              <ChevronIcon side={isProfileOpen ? "up" : "down"} />
+              {/*<ChevronIcon side={isProfileOpen ? "up" : "down"} />*/}
             </div>
-            <AnimatePresence>
+            {/*<AnimatePresence>
               {isProfileOpen ? (
                 <motion.nav
                   variants={dropDownMenuAnimationVariant}
@@ -139,16 +141,16 @@ const ConsolePage = () => {
               ) : (
                 <></>
               )}
-            </AnimatePresence>
+              </AnimatePresence>*/}
           </div>
         </header>
       }
     >
       <AnimatePresence exitBeforeEnter>
         <Routes location={location} key={location.pathname}>
-          <Route path="" element={<Navigate to="jobs" replace />} />
-          <Route path="jobs" element={<JobsPage />} />
-          <Route path="jobs/add" element={<AddJobPage />} />
+          <Route path="" element={<Navigate to="tasks" replace />} />
+          <Route path="tasks" element={<JobsPage />} />
+          <Route path="tasks/add" element={<AddJobPage />} />
         </Routes>
       </AnimatePresence>
     </MainLayout>

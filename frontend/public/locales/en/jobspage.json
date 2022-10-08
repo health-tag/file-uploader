@@ -1,5 +1,5 @@
 {
-  "jobs": "Jobs",
+  "tasks": "Upload tasks",
   "files": "Files",
   "addJob": "Add job",
   "addPage": {
@@ -12,5 +12,17 @@
     "descriptionPlaceholder": "Short description of this dataset",
     "encoding": "Encoding",
     "selectFile": "Select a file"
+  },
+  "jobViewer": {
+    "done": "Done",
+    "pending": "pending",
+    "error": "error",
+    "logs": "Logs",
+    "result": "Result",
+    "csop": "CSOP",
+    "43folders": "43 Folders",
+    "success": "Success",
+    "total": "Of Total",
+    "putResult": "PUT Result"
   }
 }

@@ -36,7 +36,7 @@ const transformResult = (results: Array<BundleResult>) => {
 const JobViewer = ({ job }: { job: Job }) => {
   const [isLogOpen, setIsLogOpen] = useState<boolean>(false);
   const [isResultOpen, setIsResultOpen] = useState<boolean>(false);
-  const { t } = useTranslation("jobspage");
+  const { t } = useTranslation("jobspage", { keyPrefix: "jobViewer" });
   const [log, setLog] = useState<string | null>(null);
   const [results, setResults] = useState<{
     successCount: number;
@@ -80,20 +80,20 @@ const JobViewer = ({ job }: { job: Job }) => {
               job.status
             )} uppercase inline-block rounded-md py-1 px-2`}
           >
-            {job.status}
+            {t(job.status)}
           </div>
           <div className="bg-primary-gradient text-white uppercase inline-block rounded-md py-1 px-2">
-            {job.type}
+            {t(job.type)}
           </div>
           <span className="text-gray-400">{job.id}</span>
         </div>
         <h4>
           {job.dataDate.toLocaleDateString("th-TH", { dateStyle: "full" })}
         </h4>
-        <div>{job.description}</div>
+        {job.description && <div>job.description</div>}
         <div>
           <h5 className="text-bold">{t("files")}</h5>
-          <ol className="my-3 p-3 rounded-lg bg-slate-100 list-decimal">
+          <ol className="mb-3 p-4 rounded-lg bg-slate-100 list-decimal">
             {job.files.map((file, i) => (
               <li key={i} className="ml-3">
                 {file}
@@ -103,14 +103,14 @@ const JobViewer = ({ job }: { job: Job }) => {
           {job.status != "pending" && (
             <>
               <Button mode="secondary" onClick={() => getLog()}>
-                Log
+                {t("logs")}
               </Button>
               <Button
                 className="ml-3"
                 mode="secondary"
                 onClick={() => getResult()}
               >
-                Result
+                {t("result")}
               </Button>
             </>
           )}
@@ -124,20 +124,16 @@ const JobViewer = ({ job }: { job: Job }) => {
       )}
       {isResultOpen && (
         <div className="my-3">
-          <p className="my-1 text-sm">
-            <b>Location</b> คือ URL ของ FHIR Resource สามารถใช้ URL
-            นี้ในการเข้าดู FHIR Resource บน FHIR Server ได้
-          </p>
-          <div className="flex flex-row gap-3">
-            <div className="p-3">
-              <div className="text-2xl">{results?.successCount}</div>
-              <div>/{results?.entriesCount}</div>
-              <div>จำนวนการส่งข้อมูลที่สำเร็จ</div>
+          <div className="my-3 card p-3">
+            <h5>{t("putResult")}</h5>
+            <div className="text-2xl">
+              {t("success")} {results?.successCount} {t("total")}{" "}
+              {results?.entriesCount}
             </div>
           </div>
           {results?.entries.groupBy("resourceName").map((g) => (
-            <>
-              <h5>{g.key}</h5>
+            <div className="mb-6">
+              <h5 className="sticky mb-3">{g.key}</h5>
               <table className="table-style-1">
                 <thead>
                   <tr>
@@ -153,7 +149,10 @@ const JobViewer = ({ job }: { job: Job }) => {
                       <td>{e.status}</td>
                       <td>
                         {e.location != null && (
-                          <a href={`${FHIR_SERVER_URL}/${e.location}`}>
+                          <a
+                            className="underline text-secondary"
+                            href={`${FHIR_SERVER_URL}/${e.location}`}
+                          >
                             {e.location}
                           </a>
                         )}
@@ -162,7 +161,7 @@ const JobViewer = ({ job }: { job: Job }) => {
                   ))}
                 </tbody>
               </table>
-            </>
+            </div>
           ))}
         </div>
       )}
@@ -184,7 +183,7 @@ const JobsPage = () => {
   return (
     <div>
       <div className="page-t flex flex-row items-center">
-        <h1 className="flex-1">{t("jobs")}</h1>
+        <h1 className="flex-1">{t("tasks")}</h1>
         <Button mode="primary" onClick={() => navigate("/jobs/add")}>
           <PencilIcon />
           {t("addJob")}

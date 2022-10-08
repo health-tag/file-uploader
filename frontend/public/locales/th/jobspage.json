@@ -1,6 +1,5 @@
 {
-  "jobs": "งาน",
-  "files": "ไฟล์",
+  "tasks": "งานอัพโหลด",
   "addJob": "เพิ่มงาน",
   "addPage": {
     "title": "เพิ่มงาน",
@@ -12,5 +11,18 @@
     "descriptionPlaceholder": "คำอธิบายสั้นๆ เกี่ยวกับข้อมูลนี้",
     "encoding": "การเข้ารหัสตัวอักษร",
     "selectFile": "เลือกไฟล์"
+  },
+  "jobViewer": {
+    "files": "ไฟล์",
+    "done": "เสร็จ",
+    "pending": "รอทำงาน",
+    "error": "ผิดพลาด",
+    "logs": "ประวัติการทำงาน",
+    "result": "ผลลัพธ์",
+    "csop": "CSOP",
+    "43folders": "43 แฟ้ม",
+    "success": "สำเร็จ",
+    "total": "จากทั้งหมด",
+    "putResult": "ผลการ PUT"
   }
 }
