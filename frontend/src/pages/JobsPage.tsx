@@ -6,9 +6,8 @@ import { JobAPI } from "services/JobService";
 import { useEffect } from "react";
 import { PencilIcon } from "@components/Icons";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { BASE_API_URL } from "App";
 import { BundleResult, EntryResult } from "@shared/models/result";
+import { AddJobPageRoute } from "./Console";
 
 const FHIR_SERVER_URL = "http://localhost:8080/fhir";
 
@@ -184,7 +183,7 @@ const JobsPage = () => {
     <div>
       <div className="page-t flex flex-row items-center">
         <h1 className="flex-1">{t("tasks")}</h1>
-        <Button mode="primary" onClick={() => navigate("/jobs/add")}>
+        <Button mode="primary" onClick={() => navigate(AddJobPageRoute)}>
           <PencilIcon />
           {t("addJob")}
         </Button>

@@ -148,9 +148,9 @@ const ConsolePage = () => {
     >
       <AnimatePresence exitBeforeEnter>
         <Routes location={location} key={location.pathname}>
-          <Route path="" element={<Navigate to="tasks" replace />} />
-          <Route path="tasks" element={<JobsPage />} />
-          <Route path="tasks/add" element={<AddJobPage />} />
+          <Route path="" element={<Navigate to={JobsPageRoute} replace />} />
+          <Route path={JobsPageRoute} element={<JobsPage />} />
+          <Route path={AddJobPageRoute} element={<AddJobPage />} />
         </Routes>
       </AnimatePresence>
     </MainLayout>
@@ -158,3 +158,6 @@ const ConsolePage = () => {
 };
 
 export default ConsolePage;
+
+export const JobsPageRoute = "tasks";
+export const AddJobPageRoute = "tasks/add";
