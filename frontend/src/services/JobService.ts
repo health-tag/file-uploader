@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Job, JobDto } from "@shared/models/job";
-import { BASE_API_URL as BASE_URL } from "App";
+import { BASE_API_URL as BASE_URL } from "configuration";
 import { BundleResult } from "@shared/models/result";
 
 export class JobAPI {

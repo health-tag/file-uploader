@@ -1,5 +1,4 @@
 import { Job, JobDto, JobEntity } from '@shared/models/job';
-import { HttpService } from '@nestjs/axios';
 import {
   Body,
   Controller,
@@ -9,22 +8,17 @@ import {
   UploadedFiles,
   UseInterceptors,
   Param,
-  Logger,
   StreamableFile,
 } from '@nestjs/common';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { JobService } from '@services/job.service';
-import { promises as fsp } from 'fs';
 import { diskStorage } from 'multer';
 import { randomUUID } from 'crypto';
-
-let FLASK_URL = 'http://python:105/api';
 
 @Controller('api/job')
 export class JobController {
   constructor(
     private readonly jobService: JobService,
-    private readonly httpService: HttpService,
   ) {}
 
   @Post()

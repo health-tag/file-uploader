@@ -26,6 +26,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { LanguageSelector } from "@components/LanguageSelector";
 import AddJobPage from "./AddJobPage";
+import { AddJobPageRoute, JobsPageRoute } from "./Routes";
 
 const ConsolePage = () => {
   const { t } = useTranslation("console");
@@ -158,6 +159,3 @@ const ConsolePage = () => {
 };
 
 export default ConsolePage;
-
-export const JobsPageRoute = "tasks";
-export const AddJobPageRoute = "tasks/add";

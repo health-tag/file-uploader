@@ -5,12 +5,6 @@ import { basename, join } from 'path';
 
 function exists(path) {
   return existsSync(path);
-  /*try {
-    existsSync(path);
-    return true;
-  } catch {
-    return false;
-  }*/
 }
 
 @Injectable()
@@ -38,7 +32,9 @@ export class JobService {
     ) as Job;
     if (exists(`${targetDir}/done`)) {
       job.status = 'done';
-    } else if (exists(`${targetDir}/error`)) {
+    } else if (exists(`${targetDir}/working`)) {
+      job.status = 'working';
+    }else if (exists(`${targetDir}/error`)) {
       job.status = 'error';
     } else {
       job.status = 'pending';

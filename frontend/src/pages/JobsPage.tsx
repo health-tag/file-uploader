@@ -7,9 +7,15 @@ import { useEffect } from "react";
 import { PencilIcon } from "@components/Icons";
 import { useNavigate } from "react-router-dom";
 import { BundleResult, EntryResult } from "@shared/models/result";
-import { AddJobPageRoute } from "./Console";
+import { AddJobPageRoute } from "./Routes";
+import { FHIR_SERVER_URL } from "configuration";
+import { ConsoleLine } from "@shared/models/console";
 
-const FHIR_SERVER_URL = "http://localhost:8080/fhir";
+let wssURL = `${window.location.protocol === "https:" ? "wss" : "ws"}://${
+  window.location.hostname
+}:3000/ws`;
+const socket = new WebSocket(wssURL);
+window["testsocket"] = socket;
 
 const transformResult = (results: Array<BundleResult>) => {
   let entries = results?.flatMap((r) => r.entries);
@@ -33,6 +39,12 @@ const transformResult = (results: Array<BundleResult>) => {
 };
 
 const JobViewer = ({ job }: { job: Job }) => {
+  //const { socket } = useContext(SocketServiceContext);
+  const [isConnected, setIsConnected] = useState(
+    socket.readyState == socket.OPEN
+  );
+  const [tick, setTick] = useState<number>(0);
+  const [isLiveLogOpen, setIsLiveLogOpen] = useState<boolean>(false);
   const [isLogOpen, setIsLogOpen] = useState<boolean>(false);
   const [isResultOpen, setIsResultOpen] = useState<boolean>(false);
   const { t } = useTranslation("jobspage", { keyPrefix: "jobViewer" });
@@ -42,6 +54,77 @@ const JobViewer = ({ job }: { job: Job }) => {
     entriesCount: number;
     entries: Array<EntryResult>;
   } | null>(null);
+
+  const [liveLog, setLiveLog] = useState<Array<ConsoleLine>>([]);
+
+  const showNormalLog = async () => {
+    await getLog();
+    setIsLiveLogOpen(false);
+    setLiveLog([]);
+  };
+
+  useEffect(() => {
+    if (job.status == "pending" || job.status == "working") {
+      console.log(job.status)
+      let openHandler = (e: Event) => {
+        setIsConnected(true);
+      };
+      let errorHandler = (e: Event) => {
+        console.log(e);
+        setIsConnected(false);
+      };
+      let closeHandler = (e: CloseEvent) => {
+        console.log(e.reason);
+        setIsConnected(false);
+      };
+      let messageHandler = (e: MessageEvent) => {
+        let { event, data }: { event: string; data: any } = JSON.parse(e.data);
+        console.log(event);
+        console.log(data);
+        switch (event) {
+          case "currentLogs":
+            if (data[job.id] !== undefined) {
+              setLiveLog(data[job.id]);
+              setIsLiveLogOpen(true);
+            }
+            break;
+          case "log":
+            if (data.jobId === job.id) {
+              setLiveLog((c) => {
+                c.push(data);
+                return c;
+              });
+              setTick((c) => c + 1);
+            }
+            break;
+          case "finishLog":
+            if (data == job.id) {
+              job.status = "done";
+              showNormalLog();
+            }
+            break;
+          case "errorLog":
+            if (data == job.id) {
+              job.status = "error";
+              showNormalLog();
+            }
+            break;
+        }
+      };
+
+      socket.addEventListener("open", openHandler);
+      socket.addEventListener("error", errorHandler);
+      socket.addEventListener("close", closeHandler);
+      socket.addEventListener("message", messageHandler);
+
+      return () => {
+        socket.removeEventListener("open", openHandler);
+        socket.removeEventListener("error", errorHandler);
+        socket.removeEventListener("close", closeHandler);
+        socket.removeEventListener("message", messageHandler);
+      };
+    }
+  }, []);
 
   const getLog = async () => {
     if (log == null) {
@@ -63,6 +146,8 @@ const JobViewer = ({ job }: { job: Job }) => {
     switch (status) {
       case "done":
         return "bg-lime-300";
+      case "working":
+        return " bg-yellow-300";
       case "error":
         return "bg-orange-300";
       default:
@@ -99,7 +184,7 @@ const JobViewer = ({ job }: { job: Job }) => {
               </li>
             ))}
           </ol>
-          {job.status != "pending" && (
+          {(job.status == "done" || job.status == "error") && (
             <>
               <Button mode="secondary" onClick={() => getLog()}>
                 {t("logs")}
@@ -115,6 +200,15 @@ const JobViewer = ({ job }: { job: Job }) => {
           )}
         </div>
       </div>
+      {isLiveLogOpen && (
+        <div className="my-3 p-3 rounded-lg bg-slate-800 text-white">
+          {liveLog.map((c, i) => (
+            <div key={i} className="whitespace-pre-line">
+              {c.line}
+            </div>
+          ))}
+        </div>
+      )}
       {isLogOpen && (
         <div
           className="my-3 p-3 rounded-lg bg-slate-800 text-white whitespace-pre-line"
@@ -169,6 +263,10 @@ const JobViewer = ({ job }: { job: Job }) => {
 };
 
 const JobsPage = () => {
+  //const { socket } = useContext(SocketServiceContext);
+  const [isConnected, setIsConnected] = useState(
+    socket.readyState == socket.OPEN
+  );
   const { t } = useTranslation("jobspage");
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<Array<Job>>(new Array<Job>());
@@ -179,10 +277,39 @@ const JobsPage = () => {
       setJobs(jobs);
     })();
   }, []);
+
+  useEffect(() => {
+    let openHandler = (e: Event) => {
+      console.log(socket.readyState);
+      setIsConnected(true);
+    };
+    let errorHandler = (e: Event) => {
+      console.log(e);
+      setIsConnected(false);
+    };
+    let closeHandler = (e: CloseEvent) => {
+      console.log(e.reason);
+      setIsConnected(false);
+    };
+    socket.addEventListener("open", openHandler);
+    socket.addEventListener("error", errorHandler);
+    socket.addEventListener("close", closeHandler);
+    return () => {
+      socket.removeEventListener("open", openHandler);
+      socket.removeEventListener("error", errorHandler);
+      socket.removeEventListener("close", closeHandler);
+    };
+  }, []);
+
   return (
     <div>
-      <div className="page-t flex flex-row items-center">
+      <div className="page-t flex flex-row items-center gap-3">
         <h1 className="flex-1">{t("tasks")}</h1>
+        {isConnected && (
+          <div className="uppercase inline-block rounded-md py-2 px-3 bg-red-400 text-white">
+            Live
+          </div>
+        )}
         <Button mode="primary" onClick={() => navigate(AddJobPageRoute)}>
           <PencilIcon />
           {t("addJob")}

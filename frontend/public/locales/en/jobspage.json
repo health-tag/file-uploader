@@ -14,8 +14,10 @@
     "selectFile": "Select a file"
   },
   "jobViewer": {
+    "files": "Files",
     "done": "Done",
     "pending": "pending",
+    "working": "working",
     "error": "error",
     "logs": "Logs",
     "result": "Result",

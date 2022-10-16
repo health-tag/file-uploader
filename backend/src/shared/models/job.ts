@@ -8,7 +8,7 @@ export class JobEntity {
 }
 
 export class Job extends JobEntity {
-  status: string = '';
+  status: "working" | "pending" | "error" | "done" | string = "";
 }
 
 export type JobDto = {

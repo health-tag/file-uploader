@@ -4,6 +4,9 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { JobService } from '@services/job.service';
 import { JobController } from 'controllers/job/job.controller';
 import { join } from 'path';
+import { ConsoleModule } from 'console.module';
+import { PythonController } from 'controllers/job/python.controller';
+import { ConsoleGateway } from 'gateways/console.gateway';
 
 @Module({
   imports: [
@@ -12,8 +15,9 @@ import { join } from 'path';
       exclude: ['/api*'],
     }),
     HttpModule,
+    ConsoleModule,
   ],
-  controllers: [JobController],
+  controllers: [JobController, PythonController],
   providers: [JobService],
 })
 export class AppModule {}

@@ -7,7 +7,8 @@ import Button from "@components/Button";
 import { KeyIcon } from "@components/Icons";
 import Select from "react-select";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
+import { JobsPageRoute } from "./Routes";
 
 const encoding = [
   { value: "utf-8", label: "UTF-8" },
@@ -97,7 +98,7 @@ const AddJobPage = () => {
     }
     JobAPI.addJobAsync(formData);
     setIsSubmitting(false);
-    navigate("/jobs");
+    navigate(JobsPageRoute);
   };
 
   return (
