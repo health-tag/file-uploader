@@ -1,5 +1,5 @@
 import Button from "@components/Button";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Job } from "@shared/models/job";
 import { JobAPI } from "services/JobService";
@@ -10,12 +10,12 @@ import { BundleResult, EntryResult } from "@shared/models/result";
 import { AddJobPageRoute } from "./Routes";
 import { FHIR_SERVER_URL } from "configuration";
 import { ConsoleLine } from "@shared/models/console";
+import { SocketContext } from "services/SocketSerivice";
 
 let wssURL = `${window.location.protocol === "https:" ? "wss" : "ws"}://${
   window.location.hostname
 }:3000/ws`;
 const socket = new WebSocket(wssURL);
-window["testsocket"] = socket;
 
 const transformResult = (results: Array<BundleResult>) => {
   let entries = results?.flatMap((r) => r.entries);
@@ -39,10 +39,7 @@ const transformResult = (results: Array<BundleResult>) => {
 };
 
 const JobViewer = ({ job }: { job: Job }) => {
-  //const { socket } = useContext(SocketServiceContext);
-  const [isConnected, setIsConnected] = useState(
-    socket.readyState == socket.OPEN
-  );
+  const { messages, isConnected } = useContext(SocketContext);
   const [tick, setTick] = useState<number>(0);
   const [isLiveLogOpen, setIsLiveLogOpen] = useState<boolean>(false);
   const [isLogOpen, setIsLogOpen] = useState<boolean>(false);
@@ -64,7 +61,43 @@ const JobViewer = ({ job }: { job: Job }) => {
   };
 
   useEffect(() => {
-    if (job.status == "pending" || job.status == "working") {
+    for (const { event, data } of messages) {
+      switch (event) {
+        case "currentLogs":
+          if (data[job.id] !== undefined) {
+            setLiveLog(data[job.id]);
+            setIsLiveLogOpen(true);
+          }
+          break;
+        case "log":
+          if (data.jobId === job.id) {
+            setLiveLog((c) => {
+              c.push(data);
+              return c;
+            });
+            setTick((c) => c + 1);
+          }
+          break;
+        case "finishLog":
+          if (data === job.id) { 
+            job.status = "done";
+            showNormalLog();
+          }
+          break;
+        case "errorLog":
+          if (data === job.id) {
+            job.status = "error";
+            showNormalLog();
+          }
+          break;
+      }
+    }
+    //let { event, data }: { event: string; data: any } = messages;
+  }, [messages]);
+
+  /*
+  useEffect(() => {
+    if (job.status === "pending" || job.status === "working") {
       console.log(job.status)
       let openHandler = (e: Event) => {
         setIsConnected(true);
@@ -98,13 +131,13 @@ const JobViewer = ({ job }: { job: Job }) => {
             }
             break;
           case "finishLog":
-            if (data == job.id) {
+            if (data === job.id) { 
               job.status = "done";
               showNormalLog();
             }
             break;
           case "errorLog":
-            if (data == job.id) {
+            if (data === job.id) {
               job.status = "error";
               showNormalLog();
             }
@@ -125,9 +158,9 @@ const JobViewer = ({ job }: { job: Job }) => {
       };
     }
   }, []);
-
+*/
   const getLog = async () => {
-    if (log == null) {
+    if (log === null) {
       let r = await JobAPI.getJobLogAsync(job.id);
       setLog(r);
     }
@@ -135,7 +168,7 @@ const JobViewer = ({ job }: { job: Job }) => {
   };
 
   const getResult = async () => {
-    if (results == null) {
+    if (results === null) {
       let r = await JobAPI.getJobResultAsync(job.id);
       setResults(transformResult(r));
     }
@@ -184,7 +217,7 @@ const JobViewer = ({ job }: { job: Job }) => {
               </li>
             ))}
           </ol>
-          {(job.status == "done" || job.status == "error") && (
+          {(job.status === "done" || job.status === "error") && (
             <>
               <Button mode="secondary" onClick={() => getLog()}>
                 {t("logs")}
@@ -263,10 +296,8 @@ const JobViewer = ({ job }: { job: Job }) => {
 };
 
 const JobsPage = () => {
-  //const { socket } = useContext(SocketServiceContext);
-  const [isConnected, setIsConnected] = useState(
-    socket.readyState == socket.OPEN
-  );
+  const { isConnected } = useContext(SocketContext);
+
   const { t } = useTranslation("jobspage");
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<Array<Job>>(new Array<Job>());
@@ -278,9 +309,9 @@ const JobsPage = () => {
     })();
   }, []);
 
+  /*
   useEffect(() => {
     let openHandler = (e: Event) => {
-      console.log(socket.readyState);
       setIsConnected(true);
     };
     let errorHandler = (e: Event) => {
@@ -300,7 +331,7 @@ const JobsPage = () => {
       socket.removeEventListener("close", closeHandler);
     };
   }, []);
-
+*/
   return (
     <div>
       <div className="page-t flex flex-row items-center gap-3">

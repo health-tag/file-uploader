@@ -74,7 +74,7 @@ const ConsolePage = () => {
         <>
           <hr />
           {/*<motion.h5 variants={menuHeaderAnimationVariants}>ข้อมูล</motion.h5>*/}
-          <NavLink to="tasks">
+          <NavLink to={JobsPageRoute}>
             <>
               <HomeIcon className="h-6" />
               {t("tasks")}
@@ -112,37 +112,9 @@ const ConsolePage = () => {
             <div className="flex items-center">
               <LanguageSelector dark={true} />
             </div>
-            <div
-              className="py-3 hover:cursor-pointer flex items-center text-white gap-1"
-              //onClick={() => setIsProfileOpen(!isProfileOpen)}
-            >
+            <div className="py-3 hover:cursor-pointer flex items-center text-white gap-1">
               <span>Admin</span>
-              {/*<ChevronIcon side={isProfileOpen ? "up" : "down"} />*/}
             </div>
-            {/*<AnimatePresence>
-              {isProfileOpen ? (
-                <motion.nav
-                  variants={dropDownMenuAnimationVariant}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  key="profile-dropdown"
-                  className={`dropdown flex flex-col gap-3`}
-                >
-                  <NavLink to="edit-personal-data">
-                    <>
-                      <PencilIcon />
-                      {t("editPersonalData")}
-                    </>
-                  </NavLink>
-                  <a className="cursor-pointer" onClick={logout}>
-                    <KeyIcon /> {t("logout")}
-                  </a>
-                </motion.nav>
-              ) : (
-                <></>
-              )}
-              </AnimatePresence>*/}
           </div>
         </header>
       }
