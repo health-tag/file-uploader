@@ -42,7 +42,7 @@ export class JobController {
     await this.jobService.addJobAsync(files, job);
   }
 
-  @Delete()
+  @Delete(':id')
   deleteJob(@Param('id') id: string) {
     this.jobService.deleteJobAsync(id);
   }

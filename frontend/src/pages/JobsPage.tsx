@@ -1,21 +1,16 @@
 import Button from "@components/Button";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Job } from "@shared/models/job";
 import { JobAPI } from "services/JobService";
 import { useEffect } from "react";
-import { PencilIcon } from "@components/Icons";
+import { PencilIcon, XIcon } from "@components/Icons";
 import { useNavigate } from "react-router-dom";
 import { BundleResult, EntryResult } from "@shared/models/result";
 import { AddJobPageRoute } from "./Routes";
 import { FHIR_SERVER_URL } from "configuration";
 import { ConsoleLine } from "@shared/models/console";
-import { SocketContext } from "services/SocketSerivice";
-
-let wssURL = `${window.location.protocol === "https:" ? "wss" : "ws"}://${
-  window.location.hostname
-}:3000/ws`;
-const socket = new WebSocket(wssURL);
+import { SocketContext } from "services/SocketProvider";
 
 const transformResult = (results: Array<BundleResult>) => {
   let entries = results?.flatMap((r) => r.entries);
@@ -38,9 +33,14 @@ const transformResult = (results: Array<BundleResult>) => {
   };
 };
 
-const JobViewer = ({ job }: { job: Job }) => {
-  const { messages, isConnected } = useContext(SocketContext);
-  const [tick, setTick] = useState<number>(0);
+const JobViewer = ({
+  job,
+  onSuccessfulDelete,
+}: {
+  job: Job;
+  onSuccessfulDelete: (id: string) => void;
+}) => {
+  const { messages } = useContext(SocketContext);
   const [isLiveLogOpen, setIsLiveLogOpen] = useState<boolean>(false);
   const [isLogOpen, setIsLogOpen] = useState<boolean>(false);
   const [isResultOpen, setIsResultOpen] = useState<boolean>(false);
@@ -51,7 +51,8 @@ const JobViewer = ({ job }: { job: Job }) => {
     entriesCount: number;
     entries: Array<EntryResult>;
   } | null>(null);
-
+  const [autoScroll, setAutoScroll] = useState<boolean>(true);
+  const liveLogDiv = useRef<HTMLDivElement>(null);
   const [liveLog, setLiveLog] = useState<Array<ConsoleLine>>([]);
 
   const showNormalLog = async () => {
@@ -61,25 +62,30 @@ const JobViewer = ({ job }: { job: Job }) => {
   };
 
   useEffect(() => {
+    if (autoScroll) {
+      liveLogDiv.current?.scroll({
+        top: liveLogDiv.current?.scrollHeight,
+        behavior: "auto",
+      });
+    }
+  }, [messages, autoScroll]);
+
+  useEffect(() => {
+    let logs = new Array<ConsoleLine>();
     for (const { event, data } of messages) {
       switch (event) {
         case "currentLogs":
           if (data[job.id] !== undefined) {
-            setLiveLog(data[job.id]);
-            setIsLiveLogOpen(true);
+            logs = data[job.id];
           }
           break;
         case "log":
           if (data.jobId === job.id) {
-            setLiveLog((c) => {
-              c.push(data);
-              return c;
-            });
-            setTick((c) => c + 1);
+            logs.push(data);
           }
           break;
         case "finishLog":
-          if (data === job.id) { 
+          if (data === job.id) {
             job.status = "done";
             showNormalLog();
           }
@@ -92,73 +98,12 @@ const JobViewer = ({ job }: { job: Job }) => {
           break;
       }
     }
-    //let { event, data }: { event: string; data: any } = messages;
+    if (logs.length > 0) {
+      setLiveLog(logs);
+      setIsLiveLogOpen(true);
+    }
   }, [messages]);
 
-  /*
-  useEffect(() => {
-    if (job.status === "pending" || job.status === "working") {
-      console.log(job.status)
-      let openHandler = (e: Event) => {
-        setIsConnected(true);
-      };
-      let errorHandler = (e: Event) => {
-        console.log(e);
-        setIsConnected(false);
-      };
-      let closeHandler = (e: CloseEvent) => {
-        console.log(e.reason);
-        setIsConnected(false);
-      };
-      let messageHandler = (e: MessageEvent) => {
-        let { event, data }: { event: string; data: any } = JSON.parse(e.data);
-        console.log(event);
-        console.log(data);
-        switch (event) {
-          case "currentLogs":
-            if (data[job.id] !== undefined) {
-              setLiveLog(data[job.id]);
-              setIsLiveLogOpen(true);
-            }
-            break;
-          case "log":
-            if (data.jobId === job.id) {
-              setLiveLog((c) => {
-                c.push(data);
-                return c;
-              });
-              setTick((c) => c + 1);
-            }
-            break;
-          case "finishLog":
-            if (data === job.id) { 
-              job.status = "done";
-              showNormalLog();
-            }
-            break;
-          case "errorLog":
-            if (data === job.id) {
-              job.status = "error";
-              showNormalLog();
-            }
-            break;
-        }
-      };
-
-      socket.addEventListener("open", openHandler);
-      socket.addEventListener("error", errorHandler);
-      socket.addEventListener("close", closeHandler);
-      socket.addEventListener("message", messageHandler);
-
-      return () => {
-        socket.removeEventListener("open", openHandler);
-        socket.removeEventListener("error", errorHandler);
-        socket.removeEventListener("close", closeHandler);
-        socket.removeEventListener("message", messageHandler);
-      };
-    }
-  }, []);
-*/
   const getLog = async () => {
     if (log === null) {
       let r = await JobAPI.getJobLogAsync(job.id);
@@ -188,6 +133,12 @@ const JobViewer = ({ job }: { job: Job }) => {
     }
   };
 
+  const deleteHandler = async () => {
+    if (await JobAPI.deleteJobAsync(job.id)) {
+      onSuccessfulDelete?.call(this, job.id);
+    }
+  };
+
   return (
     <div className="card p-3">
       <div className="flex flex-col gap-2">
@@ -203,6 +154,10 @@ const JobViewer = ({ job }: { job: Job }) => {
             {t(job.type)}
           </div>
           <span className="text-gray-400">{job.id}</span>
+          <Button mode="danger" onClick={deleteHandler}>
+            <XIcon />
+            {t("delete")}
+          </Button>
         </div>
         <h4>
           {job.dataDate.toLocaleDateString("th-TH", { dateStyle: "full" })}
@@ -235,11 +190,22 @@ const JobViewer = ({ job }: { job: Job }) => {
       </div>
       {isLiveLogOpen && (
         <div className="my-3 p-3 rounded-lg bg-slate-800 text-white">
-          {liveLog.map((c, i) => (
-            <div key={i} className="whitespace-pre-line">
-              {c.line}
-            </div>
-          ))}
+          <input
+            id={`${job.id}-autoscroll`}
+            type="checkbox"
+            className="mr-1"
+            checked={autoScroll}
+            onChange={() => setAutoScroll((c) => !c)}
+          />
+          <label htmlFor={`${job.id}-autoscroll`}>{t("autoScroll")}</label>
+          <hr className="border-white my-3" />
+          <div ref={liveLogDiv} className="max-h-[400px] overflow-y-auto">
+            {liveLog.map((c, i) => (
+              <div key={`${job.id}-${i}`} className="whitespace-pre-line">
+                {c.line}
+              </div>
+            ))}
+          </div>
         </div>
       )}
       {isLogOpen && (
@@ -305,33 +271,14 @@ const JobsPage = () => {
   useEffect(() => {
     (async () => {
       let jobs = await JobAPI.getJobsAsync();
-      setJobs(jobs);
+      setJobs(jobs.sort((a, b) => b.dataDate.getTime() - a.dataDate.getTime()));
     })();
   }, []);
 
-  /*
-  useEffect(() => {
-    let openHandler = (e: Event) => {
-      setIsConnected(true);
-    };
-    let errorHandler = (e: Event) => {
-      console.log(e);
-      setIsConnected(false);
-    };
-    let closeHandler = (e: CloseEvent) => {
-      console.log(e.reason);
-      setIsConnected(false);
-    };
-    socket.addEventListener("open", openHandler);
-    socket.addEventListener("error", errorHandler);
-    socket.addEventListener("close", closeHandler);
-    return () => {
-      socket.removeEventListener("open", openHandler);
-      socket.removeEventListener("error", errorHandler);
-      socket.removeEventListener("close", closeHandler);
-    };
-  }, []);
-*/
+  const onSuccessfulDeleteHandler = (id: string) => {
+    setJobs((currentJobs) => currentJobs.filter((j) => j.id !== id));
+  };
+
   return (
     <div>
       <div className="page-t flex flex-row items-center gap-3">
@@ -347,8 +294,12 @@ const JobsPage = () => {
         </Button>
       </div>
       <section className="flex flex-col gap-3">
-        {jobs.map((job, i) => (
-          <JobViewer key={i} job={job} />
+        {jobs.map((job) => (
+          <JobViewer
+            key={job.id}
+            job={job}
+            onSuccessfulDelete={onSuccessfulDeleteHandler}
+          />
         ))}
       </section>
     </div>

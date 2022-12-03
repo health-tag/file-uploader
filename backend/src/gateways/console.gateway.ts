@@ -29,24 +29,24 @@ export class ConsoleGateway
     }
     consoleLine['order'] = this.logs[consoleLine.jobId].length;
     this.logs[consoleLine.jobId].push(consoleLine);
-    console.log('addLog');
+    //console.log('addLog');
     this.broadcast('log', consoleLine);
   }
 
-  finishLog(logId: string) {
-    if (Object.hasOwn(this.logs, logId)) {
-      delete this.logs[logId];
+  finishLog(jobId: string) {
+    if (Object.hasOwn(this.logs, jobId)) {
+      delete this.logs[jobId];
     }
     console.log(`Send finishLog to clients`);
-    this.broadcast('finishLog', logId);
+    this.broadcast('finishLog', jobId);
   }
 
-  errorLog(logId: string) {
-    if (Object.hasOwn(this.logs, logId)) {
-      delete this.logs[logId];
+  errorLog(jobId: string) {
+    if (Object.hasOwn(this.logs, jobId)) {
+      delete this.logs[jobId];
     }
     console.log(`Send errorLog to clients`);
-    this.broadcast('errorLog', logId);
+    this.broadcast('errorLog', jobId);
   }
 
   async handleConnection(client: WebSocket) {

@@ -16,6 +16,8 @@
   "jobViewer": {
     "files": "Files",
     "done": "Done",
+    "delete": "Delete",
+    "autoScroll":"Auto scroll",
     "pending": "pending",
     "working": "working",
     "error": "error",

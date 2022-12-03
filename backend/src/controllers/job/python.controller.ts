@@ -25,7 +25,9 @@ export class PythonController {
   @Post()
   postConsoleLog(@Body() consoleLine: ConsoleLine) {
     console.log(consoleLine);
-    this.consoleGateway.addLog(consoleLine);
+    if (consoleLine.line !== '\n' && consoleLine.line !== '\r\n') {
+      this.consoleGateway.addLog(consoleLine);
+    }
   }
 
   @Get(':id/finish')
