@@ -227,7 +227,7 @@ const JobViewer = ({
         <h4>
           {job.dataDate.toLocaleDateString("th-TH", { dateStyle: "full" })}
         </h4>
-        {job.description && <div>job.description</div>}
+        {job.description && <div>{job.description}</div>}
         <div>
           <h5 className="text-bold">{t("files")}</h5>
           <ol className="mb-3 p-4 rounded-lg bg-slate-100 list-decimal">
