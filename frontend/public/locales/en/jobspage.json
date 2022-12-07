@@ -1,5 +1,5 @@
 {
-  "tasks": "Upload tasks",
+  "tasks": "Upload files",
   "files": "Files",
   "addJob": "Add job",
   "addPage": {
@@ -17,6 +17,7 @@
     "files": "Files",
     "done": "Done",
     "delete": "Delete",
+    "filter":"Filter",
     "autoScroll":"Auto scroll",
     "pending": "pending",
     "working": "working",

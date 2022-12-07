@@ -1,10 +1,8 @@
+import { WEBSOCKET_URL } from "configuration";
+
 export let socket: WebSocket | null;
 
 export const start = () => {
-  let wssURL = `${window.location.protocol === "https:" ? "wss" : "ws"}://${
-    window.location.hostname
-  }:3000/ws`;
+  let wssURL = WEBSOCKET_URL;
   socket = new WebSocket(wssURL);
 };
-
-//start();

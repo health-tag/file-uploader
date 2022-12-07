@@ -7,7 +7,7 @@ import Button from "@components/Button";
 import { KeyIcon } from "@components/Icons";
 import Select from "react-select";
 import { useEffect, useState } from "react";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { JobsPageRoute } from "./Routes";
 
 const encoding = [
@@ -86,7 +86,7 @@ const AddJobPage = () => {
     })();
   }, [billDispWatcher, billDispEncodingWatcher]);
 
-  const onValidSubmit = (data: JobDto) => {
+  const onValidSubmit = async (data: JobDto) => {
     setIsSubmitting(true);
     var formData = new FormData();
     formData.append("type", data.type);
@@ -96,15 +96,27 @@ const AddJobPage = () => {
       formData.append("billTrans", new Blob([billTransText]), "billtrans.xml");
       formData.append("billDisp", new Blob([billDispText]), "billdisp.xml");
     }
-    JobAPI.addJobAsync(formData);
+    await JobAPI.addJobAsync(formData);
     setIsSubmitting(false);
     navigate(JobsPageRoute);
   };
 
   return (
     <div>
-      <h1>{t("title")}</h1>
-      <form onSubmit={handleSubmit(onValidSubmit)}>
+      <div className="page-t flex flex-row items-center gap-3">
+        <h1 className="flex-1">{t("title")}</h1>
+        <Button
+          type="submit"
+          form="addjobform"
+          mode="primary"
+          disabled={isSubmitting || !isValid || !isFileValid}
+          isLoading={isSubmitting}
+        >
+          <KeyIcon />
+          {t("submit")}
+        </Button>
+      </div>
+      <form id="addjobform" onSubmit={handleSubmit(onValidSubmit)}>
         <div className="flex flex-row gap-3">
           <Input
             {...register("dataDate", {
@@ -132,16 +144,11 @@ const AddJobPage = () => {
           id="csop"
           {...register("type", { required: true })}
           type="radio"
+          checked={true}
           value="csop"
+          className="mr-1"
         />
         <label htmlFor="csop">CSOP</label>
-        <input
-          id="43folders"
-          {...register("type", { required: true })}
-          type="radio"
-          value="43folders"
-        />
-        <label htmlFor="43folders">43folders</label>
         {typeWatcher == "csop" && (
           <div className="my-3">
             <section>
@@ -180,7 +187,7 @@ const AddJobPage = () => {
               </div>
               {billTransWatcher && billTransWatcher.length > 0 && (
                 <textarea
-                  className="block w-full min-h-[160px]"
+                  className="p-3 block w-full min-h-[400px]"
                   value={billTransText}
                 />
               )}
@@ -222,26 +229,24 @@ const AddJobPage = () => {
               </div>
               {billDispWatcher && billDispWatcher.length > 0 && (
                 <textarea
-                  className="block w-full min-h-[160px]"
+                  className="p-3 block w-full min-h-[400px]"
                   value={billDispText}
                 />
               )}
             </section>
           </div>
         )}
-        <Button
-          className="w-full"
-          type="submit"
-          mode="primary"
-          disabled={isSubmitting || !isValid || !isFileValid}
-          isLoading={isSubmitting}
-        >
-          <KeyIcon />
-          {t("submit")}
-        </Button>
       </form>
     </div>
   );
 };
 
 export default AddJobPage;
+/*        <input
+          id="43folders"
+          {...register("type", { required: true })}
+          type="radio"
+          value="43folders"
+        />
+        <label htmlFor="43folders">43folders</label>
+        */

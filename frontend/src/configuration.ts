@@ -3,6 +3,12 @@ export const BASE_API_URL =
     ? `${process.env.PUBLIC_URL}/api`
     : "http://localhost:3000/api";
 
-export const FHIR_SERVER_URL = process.env.FHIR_SERVER_URL ?? "http://localhost:8080/fhir";
-//export const WEB_SOCKET_PORT = process.env.WEB_SOCKET_PORT ?? "";
-//export const WEBSOCKET_URL = `${new URL(BASE_API_URL).protocol}//${new URL(BASE_API_URL).host}`;
+export const FHIR_SERVER_URL =
+  process.env.FHIR_SERVER_URL ?? "http://localhost:8080/fhir";
+
+export const WEBSOCKET_URL =
+  process.env.NODE_ENV != "development"
+    ? `${window.location.protocol === "https:" ? "wss" : "ws"}://${
+        window.location.hostname
+      }:${window.location.port}/ws`
+    : "ws://localhost:3000/ws";

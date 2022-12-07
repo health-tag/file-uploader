@@ -10,6 +10,7 @@ type Props = {
   disabled?: boolean;
   onClick?: Function;
   children?: React.ReactNode;
+  [x: string]: any;
 };
 
 const Button = (props: Props) => {
@@ -23,6 +24,7 @@ const Button = (props: Props) => {
     className = "",
     disabled = false,
     onClick,
+    ...otherProps
   } = props;
 
   const handlerOnClick = () => {
@@ -36,6 +38,7 @@ const Button = (props: Props) => {
       type={type}
       disabled={disabled}
       onClick={handlerOnClick}
+      {...otherProps}
     >
       {isLoading ? (
         <div className="flex items-center gap-2 justify-center">

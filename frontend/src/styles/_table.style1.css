@@ -4,7 +4,7 @@
     mix-blend-mode: multiply;
 
     thead {
-      @apply border-b text-left bg-gray-100 text-gray-600;
+      @apply border-b text-left bg-gray-100 text-gray-600 sticky top-0;
 
       th {
         @apply text-sm font-medium p-3;
@@ -23,7 +23,7 @@
       }
 
       td {
-        @apply text-sm  p-3;
+        @apply text-sm p-3;
         word-wrap: break-word;
       }
     }

@@ -8,12 +8,25 @@ import { PencilIcon, XIcon } from "@components/Icons";
 import { useNavigate } from "react-router-dom";
 import { BundleResult, EntryResult } from "@shared/models/result";
 import { AddJobPageRoute } from "./Routes";
-import { FHIR_SERVER_URL } from "configuration";
 import { ConsoleLine } from "@shared/models/console";
 import { SocketContext } from "services/SocketProvider";
+import React from "react";
+
+import { SuccessfulTable } from "@components/ResultTable/SuccessfulTable";
+import { ErrorTable } from "@components/ResultTable/ErrorTable";
 
 const transformResult = (results: Array<BundleResult>) => {
-  let entries = results?.flatMap((r) => r.entries);
+  let entries = results?.flatMap((r) =>
+    r.entries.map((e) => {
+      if (r.fhirErrorResponse != null) {
+        e.fhirErrorResponse = {
+          status: "",
+          outcome: r.fhirErrorResponse,
+        };
+      }
+      return e;
+    })
+  );
   let entriesCount = entries.length;
   let successCount = entries
     ?.map((e): number => {
@@ -31,6 +44,54 @@ const transformResult = (results: Array<BundleResult>) => {
     entriesCount,
     entries,
   };
+};
+
+const parseStatusCode = (statusTextWithCode: string) => {
+  let statusCode = 1000;
+  try {
+    statusCode = parseInt(statusTextWithCode.replace(/\D/, ""));
+  } catch {}
+  return statusCode;
+};
+
+const renderBundleErrorTable = (
+  groupedByStatus: {
+    key: string;
+    value: EntryResult[];
+  },
+  reactKey: any
+) => {
+  return (
+    <React.Fragment key={reactKey}>
+      <p className="font-bold">{groupedByStatus.key}</p>
+      <div>
+        {groupedByStatus.value[0]?.fhirErrorResponse?.outcome.issue.map(
+          (issue, i) => (
+            <p key={i}>
+              <b className="mr-1">
+                {issue.severity} - {issue.code}
+              </b>
+              {issue.diagnostics}
+            </p>
+          )
+        )}
+      </div>
+      <table className="table-style-1">
+        <thead>
+          <tr>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {groupedByStatus.value.map((e, i) => (
+            <tr key={i}>
+              <td>{e.description}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </React.Fragment>
+  );
 };
 
 const JobViewer = ({
@@ -76,11 +137,13 @@ const JobViewer = ({
       switch (event) {
         case "currentLogs":
           if (data[job.id] !== undefined) {
+            job.status = "working";
             logs = data[job.id];
           }
           break;
         case "log":
           if (data.jobId === job.id) {
+            job.status = "working";
             logs.push(data);
           }
           break;
@@ -154,10 +217,12 @@ const JobViewer = ({
             {t(job.type)}
           </div>
           <span className="text-gray-400">{job.id}</span>
-          <Button mode="danger" onClick={deleteHandler}>
-            <XIcon />
-            {t("delete")}
-          </Button>
+          {job.status != "working" && (
+            <Button mode="danger" onClick={deleteHandler}>
+              <XIcon />
+              {t("delete")}
+            </Button>
+          )}
         </div>
         <h4>
           {job.dataDate.toLocaleDateString("th-TH", { dateStyle: "full" })}
@@ -210,51 +275,50 @@ const JobViewer = ({
       )}
       {isLogOpen && (
         <div
-          className="my-3 p-3 rounded-lg bg-slate-800 text-white whitespace-pre-line"
+          className="my-3 p-3 rounded-lg bg-slate-800 text-white whitespace-pre-line max-h-[400px] overflow-y-auto"
           dangerouslySetInnerHTML={{ __html: log as string }}
         ></div>
       )}
       {isResultOpen && (
         <div className="my-3">
-          <div className="my-3 card p-3">
+          <div className="my-3 p-3">
             <h5>{t("putResult")}</h5>
             <div className="text-2xl">
               {t("success")} {results?.successCount} {t("total")}{" "}
               {results?.entriesCount}
             </div>
           </div>
-          {results?.entries.groupBy("resourceName").map((g) => (
-            <div className="mb-6">
-              <h5 className="sticky mb-3">{g.key}</h5>
-              <table className="table-style-1">
-                <thead>
-                  <tr>
-                    <th>Description</th>
-                    <th>Status</th>
-                    <th>Location</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {g.value.map((e) => (
-                    <tr>
-                      <td>{e.description}</td>
-                      <td>{e.status}</td>
-                      <td>
-                        {e.location != null && (
-                          <a
-                            className="underline text-secondary"
-                            href={`${FHIR_SERVER_URL}/${e.location}`}
-                          >
-                            {e.location}
-                          </a>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
+          <hr className="my-3" />
+          {results?.entries
+            .groupBy("resourceName")
+            .map((groupedByResourceName, i) => (
+              <div className="mb-6" key={i}>
+                <h5 className="mb-3">{groupedByResourceName.key}</h5>
+                {groupedByResourceName.value
+                  .groupBy("status")
+                  .map((groupedByStatus, j) => {
+                    const statusCode = parseStatusCode(groupedByStatus.key);
+                    if (statusCode < 400) {
+                      return (
+                        <SuccessfulTable
+                          key={j}
+                          groupedByStatus={groupedByStatus}
+                        />
+                      );
+                    } else if (statusCode < 591) {
+                      return (
+                        <ErrorTable
+                          key={j}
+                          groupedByStatus={groupedByStatus}
+                        />
+                      );
+                    } else {
+                      return renderBundleErrorTable(groupedByStatus, j);
+                    }
+                  })}
+                <hr className="my-3" />
+              </div>
+            ))}
         </div>
       )}
     </div>
