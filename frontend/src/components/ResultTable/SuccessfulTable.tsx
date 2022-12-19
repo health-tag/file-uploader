@@ -9,7 +9,7 @@ import {
   FilterFn,
   getFilteredRowModel,
 } from "@tanstack/react-table";
-import { FHIR_SERVER_URL } from "configuration";
+import { GetFHIRPublicUrl } from "configuration";
 import React, { useRef, useState, useMemo } from "react";
 import { useVirtual } from "react-virtual";
 
@@ -72,7 +72,7 @@ export const SuccessfulTable = ({
                 key={cellInfo.cell.id}
                 className="underline text-secondary"
                 target="_blank"
-                href={`${FHIR_SERVER_URL}/${value}`}
+                href={`${GetFHIRPublicUrl()}/${value}`}
               >
                 {value}
               </a>

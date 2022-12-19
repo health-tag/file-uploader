@@ -1,6 +1,6 @@
 import App from "App";
 import { BrowserRouter } from "react-router-dom";
-import SocketProvider from "services/SocketProvider";
+import SocketProvider from "providers/SocketProvider";
 
 const AppContainer = () => {
   return (

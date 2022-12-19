@@ -38,6 +38,7 @@ export class JobController {
     job.id = id;
     job.type = jobDto.type;
     job.dataDate = new Date(jobDto.dataDate);
+    job.description = jobDto.description;
     job.taskDate = new Date();
     await this.jobService.addJobAsync(files, job);
   }

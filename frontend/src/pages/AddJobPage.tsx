@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { JobAPI } from "services/JobService";
+import { JobAPI } from "apis/JobAPI";
 import { JobDto } from "@shared/models/job";
 import { Controller, useForm } from "react-hook-form";
 import Input from "@components/InputNew";
@@ -43,7 +43,9 @@ const AddJobPage = () => {
     watch,
     handleSubmit,
     formState: { isValid, errors },
-  } = useForm<JobDto>({ mode: "onChange" });
+  } = useForm<JobDto>({
+    mode: "onChange",
+  });
 
   const {
     register: registerFile,
@@ -51,7 +53,13 @@ const AddJobPage = () => {
     watch: watchFile,
     getValues: getValuesFile,
     formState: { isValid: isFileValid, errors: errorsFile },
-  } = useForm<FilesDto>({ mode: "onChange" });
+  } = useForm<FilesDto>({
+    mode: "onChange",
+    defaultValues: {
+      billTransEncoding: encoding[1].value,
+      billDispEncoding: encoding[1].value,
+    },
+  });
 
   const typeWatcher = watch("type");
 
@@ -122,11 +130,11 @@ const AddJobPage = () => {
             {...register("dataDate", {
               valueAsDate: true,
               required: t("dataDateRequired"),
-              setValueAs: (v: string) => v.trim(),
             })}
             type="date"
             label={t("dataDate")}
             placeholder={t("dataDate")}
+            defaultValue={new Date().toLocaleDateString("sv")}
             errors={errors?.dataDate?.message}
             className="mb-6"
           />
@@ -159,7 +167,6 @@ const AddJobPage = () => {
                   <Controller
                     name="billTransEncoding"
                     control={control}
-                    defaultValue={encoding[1].value}
                     render={({ field }) => (
                       <Select
                         {...field}
@@ -187,7 +194,7 @@ const AddJobPage = () => {
               </div>
               {billTransWatcher && billTransWatcher.length > 0 && (
                 <textarea
-                  className="p-3 block w-full min-h-[400px]"
+                  className="p-3 block w-full min-h-[300px]"
                   value={billTransText}
                 />
               )}
@@ -201,7 +208,6 @@ const AddJobPage = () => {
                   <Controller
                     name="billDispEncoding"
                     control={control}
-                    defaultValue={encoding[1].value}
                     render={({ field }) => (
                       <Select
                         {...field}
@@ -229,7 +235,7 @@ const AddJobPage = () => {
               </div>
               {billDispWatcher && billDispWatcher.length > 0 && (
                 <textarea
-                  className="p-3 block w-full min-h-[400px]"
+                  className="p-3 block w-full min-h-[300px]"
                   value={billDispText}
                 />
               )}

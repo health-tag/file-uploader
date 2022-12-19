@@ -2,14 +2,14 @@ import Button from "@components/Button";
 import { useContext, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Job } from "@shared/models/job";
-import { JobAPI } from "services/JobService";
+import { JobAPI } from "apis/JobAPI";
 import { useEffect } from "react";
 import { PencilIcon, XIcon } from "@components/Icons";
 import { useNavigate } from "react-router-dom";
 import { BundleResult, EntryResult } from "@shared/models/result";
 import { AddJobPageRoute } from "./Routes";
 import { ConsoleLine } from "@shared/models/console";
-import { SocketContext } from "services/SocketProvider";
+import { SocketContext } from "providers/SocketProvider";
 import React from "react";
 
 import { SuccessfulTable } from "@components/ResultTable/SuccessfulTable";

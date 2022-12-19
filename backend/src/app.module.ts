@@ -5,8 +5,8 @@ import { JobService } from '@services/job.service';
 import { JobController } from 'controllers/job/job.controller';
 import { join } from 'path';
 import { ConsoleModule } from 'console.module';
-import { PythonController } from 'controllers/job/python.controller';
-import { ConsoleGateway } from 'gateways/console.gateway';
+import { PythonController } from 'controllers/python/python.controller';
+import { MetaController } from 'controllers/meta/meta.controller';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { ConsoleGateway } from 'gateways/console.gateway';
     HttpModule,
     ConsoleModule,
   ],
-  controllers: [JobController, PythonController],
+  controllers: [JobController, PythonController, MetaController],
   providers: [JobService],
 })
 export class AppModule {}
